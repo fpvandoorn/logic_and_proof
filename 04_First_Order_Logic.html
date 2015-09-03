@@ -1,0 +1,2000 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2015-09-03 Thu 18:25 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>Logic and Proof</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="[[http://www.andrew.cmu.edu/user/avigad][Jeremy Avigad]]Jeremy Avigad, [[http://https://www.andrew.cmu.edu/user/rlewis1/][Robert Y. Lewis]]Robert Y. Lewis,  [[http://http://www.contrib.andrew.cmu.edu/~fpv/][Floris van Doorn]]Floris van Doorn" />
+<link rel="stylesheet" href="css/tutorial.css"/>
+<link rel="stylesheet" href="css/code.css"/>
+<script type="text/javascript" charset="utf-8">if(!window.PolymerGestures) { var head = document.getElementsByTagName('head')[0]; var js = document.createElement("script"); js.type = "text/javascript"; js.src = "//cdn.jsdelivr.net/polymer.platform/0.4.2/platform.js"; head.appendChild(js); } </script>
+<link rel='import' href='juicy-ace-editor.html'/>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Logic and Proof</h1>
+
+<div id="outline-container-orgheadline7" class="outline-2">
+<h2 id="orgheadline7"><span class="section-number-2"> 4</span> First Order Logic</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Propositional logic provides a good start at describing the general
+principles of logical reasoning, but it does not go far enough. Some
+of the limitations are apparent even in the "Malice and Alice" example
+from Chapter <a href="#" onclick="myModule.loadTutorial('02_Propositional_Logic.html', 'MissingReference')">Propositional Logic</a>. Propositional logic does not give us
+the means to express a general principle that tells us that if Alice
+is with her son on the beach, then her son is with Alice; the general
+fact that no child is younger than his or her parent; or the general
+fact that if someone is alone, they are not with someone else. To
+express principles like these, we need a way to talk about objects and
+individuals, as well as their properties and the relationships between
+them. These are exactly what is provided by a more expressive logical
+framework known as <i>first-order logic</i>, which will be the topic of
+the next few chapters.
+</p>
+</div>
+
+<div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="orgheadline1"><span class="section-number-3"> 4.1</span> Functions, Relations, and Predicates</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Consider some ordinary statements about the natural numbers:
+</p>
+<ul class="org-ul">
+<li>Every natural number is even or odd, but not both.</li>
+<li>A natural number is even if and only if it is divisible by two.</li>
+<li>If some natural number, <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />, is even, then so is <img src="ltxpng/04_First_Order_Logic.org.temp_ed6ce3f28bdd6cb7db18f38999841952529801c0.png" alt="$x^2$" />.</li>
+<li>A natural number <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is even if and only if <img src="ltxpng/04_First_Order_Logic.org.temp_41d0664c70b4e630d11d6760c6ba29a4bebb7e05.png" alt="$x + 1$" /> is odd.</li>
+<li>For any three natural numbers <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" />, and <img src="ltxpng/04_First_Order_Logic.org.temp_dd06266bbc7e7e620a78269efec3e4557bda3598.png" alt="$z$" />, is <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> divides <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" />
+  and <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" /> divides <img src="ltxpng/04_First_Order_Logic.org.temp_dd06266bbc7e7e620a78269efec3e4557bda3598.png" alt="$z$" />, then <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> divides <img src="ltxpng/04_First_Order_Logic.org.temp_dd06266bbc7e7e620a78269efec3e4557bda3598.png" alt="$z$" />.</li>
+</ul>
+<p>
+These statements are true, but we generally do not think of them as
+<i>logically</i> valid: they depend on assumptions about the natural
+numbers, the meaning of the terms "even" and "odd," and so on. But
+once we accept the first statement, for example, it seems to be a
+logical consequence that the number of stairs in the White House is
+either even or odd, and, in particular, if it is not even, it is
+odd. To make sense of inferences like these, we need a logical system
+that can deal with objects, their properties, and relations between
+them.
+</p>
+
+<p>
+Rather than fix a single language once and for all, first-order logic
+allows us to specify the symbols we wish to use for any given domain
+of interest. In this section, we will use the following running
+example:
+</p>
+<ul class="org-ul">
+<li>the domain of interest is the natural numbers, <img src="ltxpng/04_First_Order_Logic.org.temp_f55a37e324745bbf04e0f5aede21b9f7c2def003.png" alt="$\mathbb{N}$" />.</li>
+<li>there are objects, <img src="ltxpng/04_First_Order_Logic.org.temp_a5f83fdd040001e0081291796bcabb628a39accb.png" alt="$1$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_ca5a63e912a49e1a363bb4b5fb865a83063e184c.png" alt="$2$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_589b4d802d7fce3611012a506403dced871832d0.png" alt="$3$" />, &#x2026;.</li>
+<li>there are functions, addition and multiplication, as well as the
+square function, on this domain.</li>
+<li>there are predicates on this domain, "even," "odd," and "prime."</li>
+<li>there are relations between elements of this domain, "equal," "less
+than", and "divides."</li>
+</ul>
+<p>
+For our logical language, we will choose symbols 1, 2, 3,
+<img src="ltxpng/04_First_Order_Logic.org.temp_17b40d1b77d9907d0ba443f1c4de9d01b6d9d0b7.png" alt="$\fn{add}$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_bc2d320999b3165aae742544f20eb52181a69d62.png" alt="$\fn{mul}$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_e5cf583c96654fc1873c2009ebcfe8e77015d290.png" alt="$\fn{square}$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_a2b78fc52e9aa05f400adb06ff4db07fd6af8e58.png" alt="$\fn{even}$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_9edb8c8cc5371d5e61536da5cf533bf0f8f53f26.png" alt="$\fn{odd}$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_0f4ae4dd73783512f2eafad5a53161d86bfa0854.png" alt="$\fn{prime}$" />,
+<img src="ltxpng/04_First_Order_Logic.org.temp_246949d99022dc0d810847b773eb7260ccd82124.png" alt="$\fn{lt}$" />, and so on, to denote these things. We will also have
+variables <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" />, and <img src="ltxpng/04_First_Order_Logic.org.temp_dd06266bbc7e7e620a78269efec3e4557bda3598.png" alt="$z$" /> ranging over the natural numbers. Note all
+of the following.
+</p>
+<ul class="org-ul">
+<li>Functions can take any number of arguments: if <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" /> are
+natural numbers, it makes sense to write <img src="ltxpng/04_First_Order_Logic.org.temp_ed19a33458d8131683b9945daa92cd8da3045a67.png" alt="$\fn{mul}(x, y)$" /> and
+<img src="ltxpng/04_First_Order_Logic.org.temp_7283f87ee3080c8371b3262175163777355ba10f.png" alt="$\fn{square}(x)$" />. so <img src="ltxpng/04_First_Order_Logic.org.temp_bc2d320999b3165aae742544f20eb52181a69d62.png" alt="$\fn{mul}$" /> takes two arguments, and
+<img src="ltxpng/04_First_Order_Logic.org.temp_e5cf583c96654fc1873c2009ebcfe8e77015d290.png" alt="$\fn{square}$" /> takes only one.</li>
+<li>Predicates and relations can also be understood in these terms. The
+predicates <img src="ltxpng/04_First_Order_Logic.org.temp_f9f953fec370de45e583f534baac7638627a5794.png" alt="$\fn{even}(x)$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_7a219e87a97e3cb43f1d65dc9bf6ddad4cac10ed.png" alt="$\fn{prime}(x)$" /> take one argument,
+while the binary relations <img src="ltxpng/04_First_Order_Logic.org.temp_7b46473ece3997e46090c8eefca7a74e387623be.png" alt="$\fn{divides}(x, y)$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_05e0d5190ea387336bcd1705633a6ff66a0dad99.png" alt="$\fn{lt}(x,y)$" />
+take two arguments.</li>
+<li>Functions are different from predicates! A function takes one or
+more arguments, and returns a <i>value</i>. A predicate takes one or more
+arguments, and is either true or false. We can think of predicates
+as returning propositions, rather than values.</li>
+<li>In fact, we can think of the constant symbols <img src="ltxpng/04_First_Order_Logic.org.temp_268eedbe5ab1a98302c11223caa829bff8523233.png" alt="$1, 2, 3, \ldots$" /> as
+special sorts of function symbols that take zero
+arguments. Analogously, we can consider the predicates that take
+zero arguments to be the constant logical values, <img src="ltxpng/04_First_Order_Logic.org.temp_5e63c8abf3b0c42012365b5702f80124df3a70e4.png" alt="$\top$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_7bea1d03799b42f9b799647895fded7894b866bd.png" alt="$\bot$" />.</li>
+<li>In ordinary mathematics, we often use "infix" notation for binary
+functions and relations. For example, we usually write <img src="ltxpng/04_First_Order_Logic.org.temp_3e9ca2930019c4ff3829344230c6d31bc79f1cde.png" alt="$x \times y$" />
+or <img src="ltxpng/04_First_Order_Logic.org.temp_561af17d4d71b740c94b6c224620729bfc042249.png" alt="$x \cdot y$" /> intead of <img src="ltxpng/04_First_Order_Logic.org.temp_ed19a33458d8131683b9945daa92cd8da3045a67.png" alt="$\fn{mul}(x, y)$" />, and we write <img src="ltxpng/04_First_Order_Logic.org.temp_e6d4062a9fb699fc7033c747c8910c34e01d63d5.png" alt="$x &amp;lt; y$" />
+instead of <img src="ltxpng/04_First_Order_Logic.org.temp_48ee0c37e4432a72f7336b043649d71ea61b5a13.png" alt="$\fn{lt}(x, y)$" />. We will use these conventions when
+writing proofs in natural deduction, and they are supported in Lean
+as well.</li>
+<li>We will treat the equality relation, <img src="ltxpng/04_First_Order_Logic.org.temp_bf29e4faa6167c250f8f41656727f1420b8a5922.png" alt="$x = y$" />, as a special binary
+relation that is included in every first-order language.</li>
+</ul>
+
+<p>
+What makes the language of first-order logic powerful is that one can
+build complex expressions out of the basic ones. Starting with the
+variables and constants, we can use the function symbols to build up
+compound expressions like these:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_99197d497e34140f20fc90ef1b95333279da1dd1.png" alt="\begin{equation*}
+x + y + z, \quad (x + 1) \times y \times y, \quad \fn{square} (x + y \times z)
+\end{equation*}
+" /></p>
+</div>
+<p>
+Such expressions are called "terms." Intuitively, they name objects
+in the intended domain of discourse.
+</p>
+
+<p>
+Now, using the predicates and relation symbols, we can make assertions
+about these expressions:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_3a494f13f7b1058791e309bd48377b0e4b261f1b.png" alt="\begin{equation*}
+\fn{even}(x + y + z), \quad \fn{prime}((x + 1) \times y \times y), \quad
+\square (x + y \times z) = w, \quad x + y &amp;lt; z
+\end{equation*}
+" /></p>
+</div>
+<p>
+Even more interestingly, we can use propositional connectives to build
+compound expressions like these:
+</p>
+<ul class="org-ul">
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_a558cef56717b2bca0a93c00ae768379deb815b9.png" alt="$\fn{even}(x + y + z) \wedge \fn{prime}((x + 1) \times y \times y)$" /></li>
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_fb685cd40066bb504533bb8d7d16b6843ff9d30e.png" alt="$\neg (\fn{square} (x + y \times z) = w) \vee x + y &amp;lt; z$" /></li>
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_cfd7378580f577e0c5b217d5a99f1be1ef962e3b.png" alt="$x &amp;lt; y \wedge \fn{even}(x) \wedge \fn{even}(y) \to x + 1 &amp;lt; y$" /></li>
+</ul>
+<p>
+The second one, for example, asserts that either <img src="ltxpng/04_First_Order_Logic.org.temp_0b9ebf87f44d7659dd876567243025bb71847a9f.png" alt="$(x + yz)^2$" /> is not
+equal to <img src="ltxpng/04_First_Order_Logic.org.temp_905d5df8ca486514ac6a4665bcdae7f6faa4ad0f.png" alt="$w$" />, or <img src="ltxpng/04_First_Order_Logic.org.temp_9c277c05123d6fa1176b0ac039b3f73a2f9f94cb.png" alt="$x + y$" /> is less than <img src="ltxpng/04_First_Order_Logic.org.temp_dd06266bbc7e7e620a78269efec3e4557bda3598.png" alt="$z$" />. Remember, these are
+expressions in symbolic logic; in ordinary mathematics, we would
+express the notions using words like "is even" and "if and only if,"
+as we did above. We will use notation like this whenever we are in the
+realm of symbolic logic, for example, when we write proofs in natural
+deduction. Expressions like these are called <i>formulas</i>. In contrast
+to terms, which name things, formulas <i>say things</i>; in other words, they
+make assertions about objects in the domain of discourse.
+</p>
+
+<p>
+One can also declare function and relation symbols in Lean. For
+example, the symbols we have just discussed could be introduced as
+follows:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-1' mode="ace/mode/lean" readonly="true">constant mul : ℕ → ℕ → ℕ
+constant add : ℕ → ℕ → ℕ
+constant square : ℕ → ℕ
+constant even : ℕ → Prop
+constant odd : ℕ → Prop
+constant prime : ℕ → Prop
+constant divides : ℕ → ℕ → Prop
+constant lt : ℕ → ℕ → Prop
+constant zero : ℕ
+constant one : ℕ
+</juicy-ace-editor><div id='lean-full-code-1' style='display:none'>constant mul : ℕ → ℕ → ℕ
+constant add : ℕ → ℕ → ℕ
+constant square : ℕ → ℕ
+constant even : ℕ → Prop
+constant odd : ℕ → Prop
+constant prime : ℕ → Prop
+constant divides : ℕ → ℕ → Prop
+constant lt : ℕ → ℕ → Prop
+constant zero : ℕ
+constant one : ℕ
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-1').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+You can enter <code>ℕ</code> with <code>\nat</code> or <code>\N</code>. In Lean, the <code>check</code> command
+can be used to make sure an expression is well-formed, and determine
+what kind of expression it is:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-2' mode="ace/mode/lean" readonly="true">variables w x y z : ℕ
+
+check mul x y
+check add x y
+check square x
+check even x</juicy-ace-editor><div id='lean-full-code-2' style='display:none'>constant mul : ℕ → ℕ → ℕ
+constant add : ℕ → ℕ → ℕ
+constant square : ℕ → ℕ
+constant even : ℕ → Prop
+constant odd : ℕ → Prop
+constant prime : ℕ → Prop
+constant divides : ℕ → ℕ → Prop
+constant lt : ℕ → ℕ → Prop
+constant zero : ℕ
+constant one : ℕ
+
+variables w x y z : ℕ
+
+check mul x y
+check add x y
+check square x
+check even x
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-2').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+We can even declare infix notation of binary operations and relations:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-3' mode="ace/mode/lean" readonly="true">infix + := add
+infix * := mul
+infix &lt; := lt</juicy-ace-editor><div id='lean-full-code-3' style='display:none'>constant mul : ℕ → ℕ → ℕ
+constant add : ℕ → ℕ → ℕ
+constant square : ℕ → ℕ
+constant even : ℕ → Prop
+constant odd : ℕ → Prop
+constant prime : ℕ → Prop
+constant divides : ℕ → ℕ → Prop
+constant lt : ℕ → ℕ → Prop
+constant zero : ℕ
+constant one : ℕ
+
+variables w x y z : ℕ
+
+check mul x y
+check add x y
+check square x
+check even x 
+
+infix + := add
+infix * := mul
+infix &lt; := lt
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-3').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+(Getting notation for numerals <code>1</code>, <code>2</code>, <code>3</code>, &#x2026; is trickier.) With
+all this in place, the examples above can be rendered as follows:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-4' mode="ace/mode/lean" readonly="true">check even (x + y + z) ∧ prime ((x + one) * y * y)
+check ¬ (square (x + y * z) = w) ∨ x + y &lt; z
+check x &lt; y ∧ even x ∧ even y → x + one &lt; y</juicy-ace-editor><div id='lean-full-code-4' style='display:none'>constant mul : ℕ → ℕ → ℕ
+constant add : ℕ → ℕ → ℕ
+constant square : ℕ → ℕ
+constant even : ℕ → Prop
+constant odd : ℕ → Prop
+constant prime : ℕ → Prop
+constant divides : ℕ → ℕ → Prop
+constant lt : ℕ → ℕ → Prop
+constant zero : ℕ
+constant one : ℕ
+
+variables w x y z : ℕ
+
+check mul x y
+check add x y
+check square x
+check even x 
+
+infix + := add
+infix * := mul
+infix &lt; := lt
+
+check even (x + y + z) ∧ prime ((x + one) * y * y)
+check ¬ (square (x + y * z) = w) ∨ x + y &lt; z
+check x &lt; y ∧ even x ∧ even y → x + one &lt; y
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-4').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+In fact, all of the functions, predicates, and relations discussed
+here, except for the "square" function and "prime," are defined in the
+core Lean library. They become available to us when we put the commands
+<code>import data.nat</code> and <code>open nat</code> at the top of a file in Lean.
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-5' mode="ace/mode/lean" readonly="true">import data.nat
+open nat
+
+constant square : ℕ → ℕ
+constant prime : ℕ → Prop
+
+variables w x y z : ℕ
+
+check even (x + y + z) ∧ prime ((x + 1) * y * y)
+check ¬ (square (x + y * z) = w) ∨ x + y &lt; z
+check x &lt; y ∧ even x ∧ even y → x + 1 &lt; y
+</juicy-ace-editor><div id='lean-full-code-5' style='display:none'>import data.nat
+open nat
+
+constant square : ℕ → ℕ
+constant prime : ℕ → Prop
+
+variables w x y z : ℕ
+
+check even (x + y + z) ∧ prime ((x + 1) * y * y)
+check ¬ (square (x + y * z) = w) ∨ x + y &lt; z
+check x &lt; y ∧ even x ∧ even y → x + 1 &lt; y
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-5').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Here, we declare the constants <code>square</code> and <code>prime</code> axiomatically, but
+refer to the other operations and predicates in the Lean library. In
+this course, we will often proceed in this way, telling you explicitly
+what facts from the library you should use for exercises.
+</p>
+
+<p>
+Here are some things to note about the syntax of expression in Lean:
+</p>
+<ul class="org-ul">
+<li>In contrast to ordinary mathematical notation, in Lean, functions
+are applied without parentheses or commas. For example, we write
+<code>square x</code> and <code>add x y</code> instead of <img src="ltxpng/04_First_Order_Logic.org.temp_7283f87ee3080c8371b3262175163777355ba10f.png" alt="$\fn{square}(x)$" /> and
+<img src="ltxpng/04_First_Order_Logic.org.temp_a04394fa1cd83d2f0062a3708912ebbffa608108.png" alt="$\fn{add}(x, y)$" />.</li>
+<li>The same holds for predicates and relations: we write <code>even x</code> and
+<code>lt x y</code> instead of <img src="ltxpng/04_First_Order_Logic.org.temp_f9f953fec370de45e583f534baac7638627a5794.png" alt="$\fn{even}(x)$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_48ee0c37e4432a72f7336b043649d71ea61b5a13.png" alt="$\fn{lt}(x, y)$" />, as one might
+do in symbolic logic.</li>
+<li>The notation <code>add : ℕ → ℕ → ℕ</code> indicates that addition takes two
+arguments, both natural numbers, and returns a natural number.</li>
+<li>Similarly, the notation <code>divides : ℕ → ℕ → Prop</code> indicates that
+<code>divides</code> is a binary relation, which takes two natural numbers as
+arguments and forms a proposition. In other words, <code>divides x y</code>
+expresses the assertion that <code>x</code> divides <code>y</code>.</li>
+</ul>
+
+<p>
+Lean can help us distinguish between terms and formulas. If we <code>check</code>
+the expression <code>x + y + 1</code> in Lean, we are told it has type <code>ℕ</code>, which
+is to say, it denotes a natural number. If we <code>check</code> the expression
+<code>even (x + y + 1)</code>, we are told that it has type <code>Prop</code>, which is to
+say, it expresses a proposition.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-3">
+<h3 id="orgheadline2"><span class="section-number-3"> 4.2</span> Quantifiers</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+There are two more ingredients to the language of first-order logic,
+namely, the universal and existential quantifiers. The universal
+quantifier, <img src="ltxpng/04_First_Order_Logic.org.temp_773687659e5c303f98d508803fb94c045c8e01cd.png" alt="$\forall$" />, followed by a variable <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is meant to
+represent the phrase "for every <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />." In other words, it asserts that
+every value of <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> has the property in question. Using the universal
+quantifier, the examples with which we began this previous section can
+be expressed as follows:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_e10b5d29e239615a3e4ce06f24a866c5a2ba1ab8.png" alt="\begin{itemize}
+\item $\fa x ((\fn{even}(x) \vee \fn{odd}(x)) \wedge \neg
+(\fn{even}(x) \wedge \neg \fn{odd}(x)))$.
+\item $\fa x (\fn{even}(x) \to \fn{even}(x^2))$
+\item $\fa x (\fn{even}(x) \liff 2 \mid x)$
+\item $\fa x \fa y \fa z (x \mid y \wedge y \mid z \to x \mid z)$.
+\end{itemize}
+" /></p>
+</div>
+<p>
+It is common to combine multiple quantifiers of the same kind, and
+write, for example, <img src="ltxpng/04_First_Order_Logic.org.temp_f9fca0acecb6d39d6a7b709bf588f813938684e6.png" alt="$\fa {x, y, z} (x \mid y \wedge y \mid z
+\to x \mid z)$" /> in the last expression.
+</p>
+
+<p>
+In Lean, you can enter the universal quantifier by writing <code>\all</code>. The
+same examples are rendered as follows:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-6' mode="ace/mode/lean" readonly="true">import data.nat
+open nat
+
+variables x y z : ℕ
+
+check ∀ x, (even x ∨ odd x) ∧ ¬ (even x ∧ odd x)
+check ∀ x, even x ↔ 2 ∣ x
+check ∀ x, even x → even (x^2)
+check ∀ x, even x ↔ odd (x + 1)
+check ∀ x y z, x ∣ y → y ∣ z → x ∣ z
+</juicy-ace-editor><div id='lean-full-code-6' style='display:none'>import data.nat
+open nat
+
+variables x y z : ℕ
+
+check ∀ x, (even x ∨ odd x) ∧ ¬ (even x ∧ odd x)
+check ∀ x, even x ↔ 2 ∣ x
+check ∀ x, even x → even (x^2)
+check ∀ x, even x ↔ odd (x + 1)
+check ∀ x y z, x ∣ y → y ∣ z → x ∣ z
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-6').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Here are some notes on syntax:
+</p>
+<ul class="org-ul">
+<li>In symbolic logic, the universal quantifier is usually taken to bind
+tightly. For example, <img src="ltxpng/04_First_Order_Logic.org.temp_fa54f8989aaf592e6ae5ee3f1dcc2df561776577.png" alt="$\fa x P \vee Q$" /> is interpreted as <img src="ltxpng/04_First_Order_Logic.org.temp_df63b1dd8c08e3b1bdbb579021954e2d73bcedf1.png" alt="$(\fa x P)
+  \vee Q$" />, and we would write <img src="ltxpng/04_First_Order_Logic.org.temp_4ee33e4367055045cf3f0164f117d062aeed9360.png" alt="$\fa x (P \vee Q)$" /> to extend the scope.</li>
+<li>In contrast, Lean expects a comma after that universal quantifer,
+and gives the it the <i>widest</i> scope possible. For example, <code>∀ x, P ∨
+  Q</code> is interpreted as <code>∀ x, (P ∨ Q)</code>, and we would write <code>(∀ x, P) ∨
+  Q</code> to limit the scope.</li>
+<li>After the quantifier <img src="ltxpng/04_First_Order_Logic.org.temp_311a890f22b2e731bacb244978c52037cf63c8fd.png" alt="$\forall x$" />, the variable <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is <i>bound</i>. For
+example, the expression <img src="ltxpng/04_First_Order_Logic.org.temp_056e8ccf43118b6fd5114c83c2633565068684be.png" alt="$\fa x (\fn{even}(x) \vee \fn{odd}(x))$" /> is
+expresses that every number is even or odd. Notice that the variable
+<img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> does not appear anywhere in the informal statement. The
+statement is not about <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> at all; rather <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is a dummy variable, a
+placeholder that stands for the "thing" referred to within a phrase
+that beings with the words "every thing." We think of the expression 
+<img src="ltxpng/04_First_Order_Logic.org.temp_056e8ccf43118b6fd5114c83c2633565068684be.png" alt="$\fa x (\fn{even}(x) \vee \fn{odd}(x))$" /> as being the same as the
+expression <img src="ltxpng/04_First_Order_Logic.org.temp_07f27da01224f667354b6ac14f6864e66e42cfa9.png" alt="$\fa y (\fn{even}(y) \vee \fn{odd}(y))$" />. Lean treats
+these expressions as the same as well.</li>
+<li>The expression <code>∀ x y z, x ∣ y → y ∣ z → x ∣ z</code> is interpreted as <code>∀
+  x y z, x ∣ y → (y ∣ z → x ∣ z)</code>, with parentheses associated to the
+<i>right</i>. The part of the expression after the universal quantifier
+can therefore be interpreted as saying "given that <code>x</code> divides <code>y</code>
+and that <code>y</code> divides <code>z</code>, <code>x</code> divides <code>z</code>." The expression is
+logically equivalent to <code>∀ x y z, x ∣ y ∧ y ∣ z → x ∣ z</code>, but we
+will see that, in Lean, it is often convenient to express facts like
+this as an iterated implication.</li>
+</ul>
+
+<p>
+A variable that is not bound is called <i>free</i>. Notice that formulas in
+first-order logic say things about their free variables. For example,
+in the interpretation we have in mind, the formula <img src="ltxpng/04_First_Order_Logic.org.temp_fde629bc0156c7f2d37a5e929b83a5edf1088820.png" alt="$\fa y (x \le y)$" />
+says that <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is less than or equal to every natural number. The
+formula <img src="ltxpng/04_First_Order_Logic.org.temp_470dd825df655c64dedf6ebdc4ef45c942845367.png" alt="$\fa z (x \le z)$" /> says exactly the same thing; we can always
+rename a bound variable, as long as we pick a name that does not clash
+with another name that is already in use. On the other hand, the
+formula <img src="ltxpng/04_First_Order_Logic.org.temp_8d6131df414843e2abfe547da93f59add8b058b3.png" alt="$\fa y (w \le y)$" /> says that <img src="ltxpng/04_First_Order_Logic.org.temp_905d5df8ca486514ac6a4665bcdae7f6faa4ad0f.png" alt="$w$" /> is less than or equal to every
+natural number. This is an entirely different statement: it says
+something about <img src="ltxpng/04_First_Order_Logic.org.temp_905d5df8ca486514ac6a4665bcdae7f6faa4ad0f.png" alt="$w$" />, rather than <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />. In other words, renaming a
+<i>free</i> variable changes the meaning of a formula.
+</p>
+
+<p>
+Notice also that some formulas, like <img src="ltxpng/04_First_Order_Logic.org.temp_1a53ba4e0488ca39205b2681d6a8e978136c2956.png" alt="$\fa {x, y} (x \le y \vee y \le
+x)$" />, have no free variables at all. Such a formula is called a
+<i>sentence</i>, because it makes an outright assertion, a statement that
+is either true or false about the intended interpretation. A couple of
+chapters from now, we will make the notion of an "intended
+interpetation" precise, and talk about what it means to be "true in an
+interpretation." For now, the idea that formulas say things about
+about object in an intended interpretation should motivate the rules
+for reasoning with such expressions. 
+</p>
+
+<p>
+Dual to the universal quantifier is the existential quantifier,
+<img src="ltxpng/04_First_Order_Logic.org.temp_3b2b11b2089d283bf62ba1f9595b2f98f38985f8.png" alt="$\exists$" />, which is used to express assertions such as "some number is
+even," or, "between any two even numbers there is an odd number." We
+will discuss the existential quantifier and its use in a later
+chapter. 
+</p>
+
+<p>
+Indeed, to complete the presentation of first-order logic, we need to
+present the rules of the universal quantifier, the existential
+quantifier, and equality in natural deduction, and in Lean. In this
+chapter, we will start with the rules for the universal quantifier,
+and provide examples of the kinds of mathematical arguments they are
+intended to model.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline3" class="outline-3">
+<h3 id="orgheadline3"><span class="section-number-3"> 4.3</span> Rules for the Universal Quantifier</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+In the <a href="#" onclick="myModule.loadTutorial('01_Introduction.html', 'MissingReference')">Introduction</a> we proved that the square root of two is
+irrational. One way to construe the statement is as follows:
+</p>
+<blockquote>
+<p>
+For every pair of natural numbers, <img src="ltxpng/04_First_Order_Logic.org.temp_f12c734449da3952c2152f79cb9cae124139effb.png" alt="$a$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_6c7dbc4aa7cf1b45f978f27ac2907026d436eed5.png" alt="$b$" />, it is not the case
+that <img src="ltxpng/04_First_Order_Logic.org.temp_d3397dc47e124a1497f7420668c1b141ffbd6237.png" alt="$a^2 = 2 b^2$" />.
+</p>
+</blockquote>
+<p>
+The advantage of this formulation is that we can restrict our
+attention to the natural numbers, without having to consider the
+larger domain of rationals. In symbolic logic, assuming our intended
+domain of discourse is the natural numbers, we woud express this
+theorem using the universal quantifier:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_24681a1a28028af7662cfe28ee1d92d9e83825bc.png" alt="\begin{equation*}
+\fa {a, b} \neg (a^2 = 2 b^2). 
+\end{equation*}
+" /></p>
+</div>
+<p>
+How do we prove such a theorem? Informally, we would use such a
+pattern:
+</p>
+<blockquote>
+<p>
+Let <img src="ltxpng/04_First_Order_Logic.org.temp_f12c734449da3952c2152f79cb9cae124139effb.png" alt="$a$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_6c7dbc4aa7cf1b45f978f27ac2907026d436eed5.png" alt="$b$" /> be arbitrary integers, and suppose <img src="ltxpng/04_First_Order_Logic.org.temp_d3397dc47e124a1497f7420668c1b141ffbd6237.png" alt="$a^2 = 2 b^2$" />.
+</p>
+
+<p>
+&#x2026;
+</p>
+
+<p>
+Contradiction.
+</p>
+</blockquote>
+<p>
+What we are really doing is proving that the universal statement
+holds, but showing that it holds of "arbitrary" values <img src="ltxpng/04_First_Order_Logic.org.temp_f12c734449da3952c2152f79cb9cae124139effb.png" alt="$a$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_6c7dbc4aa7cf1b45f978f27ac2907026d436eed5.png" alt="$b$" />. In
+natural deduction, the proof would look something like this:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_53a1b5c1e9f67e736ee1e275cdec4c3cb852aa70.png" alt="\begin{prooftree}
+\AXM{}
+\UIM{H : a^2 = 2 \times b^2}
+\UIM{\vdots}
+\UIM{\bot}
+\RLM{H}
+\UIM{\neg (a^2 = 2 \times b^2)}
+\UIM{\fa b \neg (a^2 = 2 \times b^2)}
+\UIM{\fa a \fa b \neg (a^2 = 2 \times b^2)}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+Notice that after the hypothesis <img src="ltxpng/04_First_Order_Logic.org.temp_5036dd76902b97a998bc024eb115e3b1e701dbb8.png" alt="$H$" /> is canceled, we have proved <img src="ltxpng/04_First_Order_Logic.org.temp_6156fc74e997f418e85077666f35b3a777c16441.png" alt="$\neg
+(a^2 = 2 \times b^2)$" /> without making any assumptions about <img src="ltxpng/04_First_Order_Logic.org.temp_f12c734449da3952c2152f79cb9cae124139effb.png" alt="$a$" /> and
+<img src="ltxpng/04_First_Order_Logic.org.temp_6c7dbc4aa7cf1b45f978f27ac2907026d436eed5.png" alt="$b$" />; at this stage in the proof, they are "arbitrary," justifying the
+application of the universal quantifiers in the next two rules.
+</p>
+
+<p>
+This example motivates the following rule in natural deduction:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_46277ae10170da740b8cbf81af0d6c3361eb2e82.png" alt="\begin{prooftree}
+\AXM{A(x)}
+\UIM{\fa x A(x)}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+provided <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is not free in any uncanceled hypothesis. Here <img src="ltxpng/04_First_Order_Logic.org.temp_1dd285ea81b65dd1a3cbd20396bb18c2e8773e54.png" alt="$A(x)$" />
+stands for any formula that (potentially) mentions <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />. Also remember
+that if <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" /> is any "fresh" variable that does not occur in <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />, we are
+thinking of <img src="ltxpng/04_First_Order_Logic.org.temp_330418a8b68cbfd376a4cbd9c91f06467289644c.png" alt="$\fa x A(x)$" /> as being the same as <img src="ltxpng/04_First_Order_Logic.org.temp_be142cc2e8d2d5c2d24aea0974f417e1a15061ab.png" alt="$\fa y A(y)$" />.
+</p>
+
+<p>
+Notice that when we work in first-order logic, we assume that the
+universal quantifier ranges over some domain. In Lean, we can declare
+a "type" of objects by writing <code>variable U : Type</code>. We can then
+declare a predicate on <code>U</code> by writing <code>variable P : U → Prop</code>. In
+Lean, then, the pattern for proving a universal statement is rendered
+as follows:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-7' mode="ace/mode/lean" readonly="true">variable U : Type
+variable P : U → Prop
+
+example : ∀ x, P x :=
+take x,
+show P x, from sorry
+</juicy-ace-editor><div id='lean-full-code-7' style='display:none'>variable U : Type
+variable P : U → Prop
+
+example : ∀ x, P x :=
+take x,
+show P x, from sorry
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-7').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Read <code>take x</code> as "fix and arbitrary value <code>x</code> of <code>U</code>." Since we are
+allowed to rename bound variables at will, we can equivalently write
+either of the following:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-8' mode="ace/mode/lean" readonly="true">variable U : Type
+variable P : U → Prop
+
+example : ∀ y, P y :=
+take x,
+show P x, from sorry
+
+example : ∀ x, P x :=
+take y,
+show P y, from sorry
+</juicy-ace-editor><div id='lean-full-code-8' style='display:none'>variable U : Type
+variable P : U → Prop
+
+example : ∀ y, P y :=
+take x,
+show P x, from sorry
+
+example : ∀ x, P x :=
+take y,
+show P y, from sorry
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-8').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+This constitutes the introduction rule for the universal quantifier. 
+</p>
+
+<p>
+What about the elimination rule? Suppose we know that every number is
+even or odd. Then, in an ordinary proof, we are free to assert "<img src="ltxpng/04_First_Order_Logic.org.temp_f12c734449da3952c2152f79cb9cae124139effb.png" alt="$a$" /> is
+even or <img src="ltxpng/04_First_Order_Logic.org.temp_f12c734449da3952c2152f79cb9cae124139effb.png" alt="$a$" /> is odd," or "<img src="ltxpng/04_First_Order_Logic.org.temp_8f6a6db17f7fe45faf24929519dfe7911b300ab8.png" alt="$a^2$" /> is even or <img src="ltxpng/04_First_Order_Logic.org.temp_8f6a6db17f7fe45faf24929519dfe7911b300ab8.png" alt="$a^2$" /> is odd." In terms of
+symbolic logic, this amounts to the following inference: from <img src="ltxpng/04_First_Order_Logic.org.temp_d88270099aa96d57d4e212c02e97e3af929ad3e4.png" alt="$\fa x
+(\fn{even}(x) \vee \fn{odd}(x))$" />, we can conclude <img src="ltxpng/04_First_Order_Logic.org.temp_51fe4be8caecc3a20794d12aa549ba9b44fdc91b.png" alt="$\fn{even}(t) \vee
+\fn{odd}(t)$" /> for any term <img src="ltxpng/04_First_Order_Logic.org.temp_483eb328af194237825b7ad68d31af6aa5b34274.png" alt="$t$" />. This motivates the elimination rule for
+the universal quantifier:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_44efb8fe2dc72cab68badd3ac8934d702bdd73b9.png" alt="\begin{prooftree}
+\AXM{\fa x A(x)}
+\UIM{A(t)}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+where <img src="ltxpng/04_First_Order_Logic.org.temp_483eb328af194237825b7ad68d31af6aa5b34274.png" alt="$t$" /> is an arbitrary term. In a Lean proof, this is implemented
+as follows:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-9' mode="ace/mode/lean" readonly="true">variable U : Type
+variable P : U → Prop
+premise H : ∀ x, P x
+variable a : U
+
+example : P a :=
+show P a, from H a
+</juicy-ace-editor><div id='lean-full-code-9' style='display:none'>variable U : Type
+variable P : U → Prop
+premise H : ∀ x, P x
+variable a : U
+
+example : P a :=
+show P a, from H a
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-9').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Observe the notation: <code>P a</code> is obtained by "applying" the hypothesis
+<code>H</code> to <code>a</code>.
+</p>
+
+<p>
+The following example of a proof in natural deduction shows that if,
+for every <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_1dd285ea81b65dd1a3cbd20396bb18c2e8773e54.png" alt="$A(x)$" /> holds, and for every <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_3bea4bbf0e2b6efe946437b293cb1a895e7137c7.png" alt="$B(x)$" /> holds, then for
+every <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />, they both hold:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_9a1dafd465677d4cf7404ba2382b60422b71d7d4.png" alt="\begin{prooftree}
+\AXM{HA : \fa x A(x)}
+\UIM{A(y)}
+\AXM{HB : \fa x B(x)}
+\UIM{B(y)}
+\BIM{A(y) \wedge B(y)}
+\UIM{\fa y (A(y) \wedge B(y))}
+\RLM{HB}
+\UIM{\fa x B(x) \to \fa y (A(y) \wedge B(y))}
+\RLM{HA}
+\UIM{\fa x A(x) \to (\fa x B(x) \to \fa y (A(y) \wedge B(y)))}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+Notice that neither of the hypotheses <img src="ltxpng/04_First_Order_Logic.org.temp_ad2ca85069ca3bd4f9825b6db972d028dfa994c0.png" alt="$HA$" /> or <img src="ltxpng/04_First_Order_Logic.org.temp_a222cf7178b68b7545160562ff975e41438322e3.png" alt="$HB$" /> mention <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" />, so
+that <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" /> is really "arbitrary" at the point where the universal
+quantifiers are introduced.
+</p>
+
+<p>
+Here is the same proof rendered in Lean:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-10' mode="ace/mode/lean" readonly="true">variable U : Type
+variables A B : U → Prop
+
+example : (∀ x, A x) → (∀ x, B x) → (∀ x, A x ∧ B x) :=
+assume HA : ∀ x, A x,
+assume HB : ∀ x, B x,
+take y,
+have A y, from HA y,
+have B y, from HB y,
+show A y ∧ B y, from and.intro `A y` `B y`
+</juicy-ace-editor><div id='lean-full-code-10' style='display:none'>variable U : Type
+variables A B : U → Prop
+
+example : (∀ x, A x) → (∀ x, B x) → (∀ x, A x ∧ B x) :=
+assume HA : ∀ x, A x,
+assume HB : ∀ x, B x,
+take y,
+have A y, from HA y,
+have B y, from HB y,
+show A y ∧ B y, from and.intro `A y` `B y`
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-10').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+As an exercise, trying proving <img src="ltxpng/04_First_Order_Logic.org.temp_7b8a8fcbb4793f5aba0b9713514cac3442a2c1b8.png" alt="$(\fa x (A(x) \wedge B(x))) \to \fa x
+A(x)$" /> in natural deduction or Lean, or
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_9aea31ce63bc74f7fb153fa1ee8f3e7eef8af6af.png" alt="\begin{equation*}
+(\fa x (A(x) \to B(x))) \to (\fa x A(x) \to \fa x B(x)).
+\end{equation*}
+" /></p>
+</div>
+<p>
+Here is a more challenging exercise. Suppose I tell you that, in a town,
+there is a (male) barber that shaves all and only the men who do not
+shave themselves. You can show that this is a contradiction, arguing
+informally, as follows:
+</p>
+<blockquote>
+<p>
+By the assumption, the barber shaves himself if and only if he does
+not shave himself. Call this statement (*).
+</p>
+
+<p>
+Suppose the barber shaves himself. By (*), this implies that he does
+not shave himself, a contradiction. So, the barber does not shave
+himself.
+</p>
+
+<p>
+But using (*) again, this implies that the barber shaves himself,
+which contradicts the fact we just showed, namely, that the barber
+does not shave himself. 
+</p>
+</blockquote>
+<p>
+Try to turn this into a formal argument in natural deduction, or in
+Lean. For the latter, you need only replace each <code>sorry</code> below with a
+proof:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-11' mode="ace/mode/lean" readonly="true">variable Person : Type
+variable shaves : Person → Person → Prop
+variable barber : Person
+premise H : ∀ x, shaves barber x ↔ ¬ shaves x x
+
+example : false :=
+have H1 : shaves barber barber ↔ ¬ shaves barber barber, from sorry,
+have H2 : ¬ shaves barber barber, from
+  assume H2a : shaves barber barber,
+  have H2b : ¬ shaves barber barber, from sorry,
+  show false, from sorry,
+have H3 : shaves barber barber, from sorry,
+show false, from sorry
+</juicy-ace-editor><div id='lean-full-code-11' style='display:none'>variable Person : Type
+variable shaves : Person → Person → Prop
+variable barber : Person
+premise H : ∀ x, shaves barber x ↔ ¬ shaves x x
+
+example : false :=
+have H1 : shaves barber barber ↔ ¬ shaves barber barber, from sorry,
+have H2 : ¬ shaves barber barber, from
+  assume H2a : shaves barber barber,
+  have H2b : ¬ shaves barber barber, from sorry,
+  show false, from sorry,
+have H3 : shaves barber barber, from sorry,
+show false, from sorry
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-11').text());">Try it yourself &raquo;</button></div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline4" class="outline-3">
+<h3 id="orgheadline4"><span class="section-number-3"> 4.4</span> Some Number Theory</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+Let us return to the example of the natural numbers, to see how
+deductive notions play out there. Suppose we have defined <img src="ltxpng/04_First_Order_Logic.org.temp_a2b78fc52e9aa05f400adb06ff4db07fd6af8e58.png" alt="$\fn{even}$" />
+and <img src="ltxpng/04_First_Order_Logic.org.temp_9edb8c8cc5371d5e61536da5cf533bf0f8f53f26.png" alt="$\fn{odd}$" /> in such a way that we can prove:
+</p>
+<ul class="org-ul">
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_781c5ba04826d8ee7a735d3e1eda6d6688142a27.png" alt="$\fa n, \neg \even(n) \to \odd(n)$" /></li>
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_559fb3c30fb4d559fc2a811a0f0e792213ab60e0.png" alt="$\fa n \odd(n) \to \neg \even(n)$" /></li>
+</ul>
+<p>
+Then we can go on to derive <img src="ltxpng/04_First_Order_Logic.org.temp_00114902ad7ce42894fb8051de60ed230cd0687f.png" alt="$\fa n (\even(n) \vee \odd(n))$" /> as
+follows:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_ce9b4cf6c58c8e9cf8528015b78baaa07a38d491.png" alt="\begin{prooftree}
+\AXM{}
+\UIM{\even(n) \vee \neg \even(n)}
+\AXM{}
+\UIM{H_1 : \even(n)}
+\UIM{\even(n) \vee \odd(n)}
+\AXM{}
+\UIM{\fa n \neg \even(n) \to \odd(n)}
+\UIM{\neg \even (n) \to \odd(n)}
+\AXM{}
+\UIM{H_2 : \neg \even(n)}
+\BIM{\odd(n)}
+\UIM{\even(n) \vee \odd(n)}
+\RLM{H_1, H_2}
+\TIM{\even(n) \vee \odd(n)}
+\UIM{\fa n (\even (n) \vee \odd(n)}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+We can also prove and <img src="ltxpng/04_First_Order_Logic.org.temp_959fb49a71e0ded047849c915810ec8097bc9c8f.png" alt="$\fa n \neg (\even(n) \wedge \odd(n))$" />:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_df67b546e067e471d92a4fde465761c3d1610788.png" alt="\begin{prooftree}
+\AXM{}
+\UIM{\odd(n) \to \neg \even(n)}
+\AXM{}
+\UIM{H : \even(n) \wedge \odd(n)}
+\UIM{\odd(n)}
+\BIM{\neg \even(n)}
+\AXM{}
+\UIM{H : \even(n) \wedge \odd(n)}
+\UIM{\even(n)}
+\BIM{\bot}
+\RLM{H}
+\UIM{\neg (\even(n) \wedge \odd(n))}
+\UIM{\fa n \neg (\even(n) \wedge \odd(n))}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+As we move from modeling basic rules of inference, however modeling
+actual mathematical proofs, we will tend to shift focus from natural
+deduction to formal proofs in Lean. Natural deduction has its uses: as
+a basic model of logical reasoning, it provides us with a convenient
+means to study metatheoretic properties such as soundness and
+completeness. For working <i>within</i> the system, however, proof
+languages like Lean's tend to scale better, and produce more readable
+proofs.
+</p>
+
+<p>
+In Lean's library, there are theorems <code>odd_of_not_even</code> and
+<code>even_of_not_odd</code>, whose uses are illustrated in the following:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-12' mode="ace/mode/lean" readonly="true">import data.nat
+open nat
+
+example : ∀ n, ¬ even n → odd n :=
+take n,
+assume H : ¬ even n, 
+show odd n, from odd_of_not_even H
+
+example : ∀ n, odd n → ¬ even n :=
+take n,
+assume H : odd n,
+show ¬ even n, from not_even_of_odd H
+</juicy-ace-editor><div id='lean-full-code-12' style='display:none'>import data.nat
+open nat
+
+example : ∀ n, ¬ even n → odd n :=
+take n,
+assume H : ¬ even n, 
+show odd n, from odd_of_not_even H
+
+example : ∀ n, odd n → ¬ even n :=
+take n,
+assume H : odd n,
+show ¬ even n, from not_even_of_odd H
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-12').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Once again, notice the naming scheme: the conlusion is followed by the
+hypothesis, separated by the word <code>of</code>. Notice also that when applying
+the theorems, you do not need to specify the argument <code>n</code>: it is
+implicit in the hypothesis <code>H</code>. We can illustrate these theorems more
+concisely, by labeling <code>n</code> and <code>H</code> in the statement of the example:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-13' mode="ace/mode/lean" readonly="true">example (n : ℕ) (H : ¬ even n) : odd n :=
+odd_of_not_even H
+
+example (n : ℕ) (H : odd n) : ¬ even n :=
+not_even_of_odd H</juicy-ace-editor><div id='lean-full-code-13' style='display:none'>import data.nat
+open nat
+
+example (n : ℕ) (H : ¬ even n) : odd n :=
+odd_of_not_even H
+
+example (n : ℕ) (H : odd n) : ¬ even n :=
+not_even_of_odd H
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-13').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+In this text, we will often present theorems in the library in this
+way. Using these two theorems, the two facts we just proved in natural
+deduction can be proved in Lean as follows:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-14' mode="ace/mode/lean" readonly="true">import data.nat
+open nat classical
+
+example : ∀ n, even n ∨ odd n :=
+take n,
+or.elim (em (even n))
+  (suppose even n, 
+    show even n ∨ odd n, from or.inl this)
+  (suppose ¬ even n,
+    have odd n, from odd_of_not_even this,
+    show even n ∨ odd n, from or.inr this)
+
+example : ∀ n, ¬ (even n ∧ odd n) :=
+take n,
+assume H : even n ∧ odd n,
+have even n, from and.left H,
+have odd n, from and.right H,
+have ¬ even n, from not_even_of_odd this,
+show false, from `¬ even n` `even n`
+</juicy-ace-editor><div id='lean-full-code-14' style='display:none'>import data.nat
+open nat classical
+
+example : ∀ n, even n ∨ odd n :=
+take n,
+or.elim (em (even n))
+  (suppose even n, 
+    show even n ∨ odd n, from or.inl this)
+  (suppose ¬ even n,
+    have odd n, from odd_of_not_even this,
+    show even n ∨ odd n, from or.inr this)
+
+example : ∀ n, ¬ (even n ∧ odd n) :=
+take n,
+assume H : even n ∧ odd n,
+have even n, from and.left H,
+have odd n, from and.right H,
+have ¬ even n, from not_even_of_odd this,
+show false, from `¬ even n` `even n`
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-14').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Notice that we used the command <code>open classical</code> in order to use the
+law of the excluded middle, <code>em (even n)</code>, to split on cases.
+</p>
+
+<p>
+Here are some more facts about parity that are found in the Lean
+library:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-15' mode="ace/mode/lean" readonly="true">example (n : ℕ) (H : even n) : 2 ∣ n :=
+dvd_of_even H
+
+example (n : ℕ) (H : 2 ∣ n) : even n :=
+even_of_dvd H
+
+example (n : ℕ) : n ∣ n := dvd.refl n
+
+example (k m n : ℕ) (H₁ : k ∣ m) (H₂ : m ∣ n) : k ∣ n :=
+dvd.trans H₁ H₂
+
+example (k m n : ℕ) (H₁ : k ∣ m) (H₂ : k ∣ n) : k ∣ m + n :=
+dvd_add H₁ H₂
+
+example (k m n : ℕ) (H₁ : k ∣ m + n) (H₂ : k ∣ m) : k ∣ n :=
+dvd_of_dvd_add_left H₁ H₂
+
+example (k m n : ℕ) (H₁ : k ∣ m + n) (H₂ : k ∣ n) : k ∣ m :=
+dvd_of_dvd_add_right H₁ H₂
+
+example : odd 1 :=
+odd_one</juicy-ace-editor><div id='lean-full-code-15' style='display:none'>import data.nat
+open nat
+
+example (n : ℕ) (H : even n) : 2 ∣ n :=
+dvd_of_even H
+
+example (n : ℕ) (H : 2 ∣ n) : even n :=
+even_of_dvd H
+
+example (n : ℕ) : n ∣ n := dvd.refl n
+
+example (k m n : ℕ) (H₁ : k ∣ m) (H₂ : m ∣ n) : k ∣ n :=
+dvd.trans H₁ H₂
+
+example (k m n : ℕ) (H₁ : k ∣ m) (H₂ : k ∣ n) : k ∣ m + n :=
+dvd_add H₁ H₂
+
+example (k m n : ℕ) (H₁ : k ∣ m + n) (H₂ : k ∣ m) : k ∣ n :=
+dvd_of_dvd_add_left H₁ H₂
+
+example (k m n : ℕ) (H₁ : k ∣ m + n) (H₂ : k ∣ n) : k ∣ m :=
+dvd_of_dvd_add_right H₁ H₂
+
+example : odd 1 :=
+odd_one
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-15').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+To enter the "divides" symbol in Lean, you have to type <code>\|</code>. (The
+symbol is different from the plain <code>|</code> character.) Here are some
+examples of theorems that can be proved using these facts:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-16' mode="ace/mode/lean" readonly="true">import data.nat
+open nat
+
+example : ∀ m n, even m → m ∣ n → even n :=
+take m, take n,
+suppose even m,
+suppose m ∣ n,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ n, from dvd.trans this `m ∣ n`,
+show even n, from even_of_dvd this
+
+example : ∀ m n, even m → even n → even (m + n) :=
+take m, take n,
+suppose even m,
+suppose even n,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ n, from dvd_of_even `even n`,
+have 2 ∣ m + n, from dvd_add `2 ∣ m` `2 ∣ n`,
+show even (m + n), from even_of_dvd this
+
+example : ∀ m n, even (m + n) → even m → even n :=
+take m, take n,
+suppose even (m + n),
+suppose even m,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ (m + n), from dvd_of_even `even (m + n)`,
+have 2 ∣ n, from dvd_of_dvd_add_left `2 ∣ m + n` `2 ∣ m`,
+show even n, from even_of_dvd this
+
+example : ∀ m n, even (m + n) → even n → even m :=
+sorry
+
+example : even 2 :=
+have 2 ∣ 2, from dvd.refl 2,
+show even 2, from even_of_dvd this
+</juicy-ace-editor><div id='lean-full-code-16' style='display:none'>import data.nat
+open nat
+
+example : ∀ m n, even m → m ∣ n → even n :=
+take m, take n,
+suppose even m,
+suppose m ∣ n,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ n, from dvd.trans this `m ∣ n`,
+show even n, from even_of_dvd this
+
+example : ∀ m n, even m → even n → even (m + n) :=
+take m, take n,
+suppose even m,
+suppose even n,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ n, from dvd_of_even `even n`,
+have 2 ∣ m + n, from dvd_add `2 ∣ m` `2 ∣ n`,
+show even (m + n), from even_of_dvd this
+
+example : ∀ m n, even (m + n) → even m → even n :=
+take m, take n,
+suppose even (m + n),
+suppose even m,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ (m + n), from dvd_of_even `even (m + n)`,
+have 2 ∣ n, from dvd_of_dvd_add_left `2 ∣ m + n` `2 ∣ m`,
+show even n, from even_of_dvd this
+
+example : ∀ m n, even (m + n) → even n → even m :=
+sorry
+
+example : even 2 :=
+have 2 ∣ 2, from dvd.refl 2,
+show even 2, from even_of_dvd this
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-16').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+The second-to-last one is left to you as an exercise. Remember, when
+you are trying to prove such theorems on your own, it is a good idea
+to prove them incrementally, using <code>sorry</code>. For example, for the first
+theorem, you might start as follows:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-17' mode="ace/mode/lean" readonly="true">example : ∀ m n, even m → m ∣ n → even n :=
+take m, take n,
+suppose even m,
+suppose m ∣ n,
+show even n, from sorry</juicy-ace-editor><div id='lean-full-code-17' style='display:none'>import data.nat
+open nat
+
+example : ∀ m n, even m → m ∣ n → even n :=
+take m, take n,
+suppose even m,
+suppose m ∣ n,
+show even n, from sorry
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-17').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+After checking to make sure that Lean accepts this, you can then add
+intermediate <code>have</code> statements, and so on.
+</p>
+
+<p>
+If you wanted to use these theorems later on, you could name them:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-18' mode="ace/mode/lean" readonly="true">import data.nat
+open nat
+
+theorem even_add_of_even_of_even : ∀ {m n}, even m → even n → even (m + n) :=
+take m, take n,
+suppose even m,
+suppose even n,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ n, from dvd_of_even `even n`,
+have 2 ∣ m + n, from dvd_add `2 ∣ m` `2 ∣ n`,
+show even (m + n), from even_of_dvd this
+
+theorem even_of_even_add_left : ∀ {m n}, even (m + n) → even m → even n :=
+take m, take n,
+suppose even (m + n),
+suppose even m,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ (m + n), from dvd_of_even `even (m + n)`,
+have 2 ∣ n, from dvd_of_dvd_add_left `2 ∣ m + n` `2 ∣ m`,
+show even n, from even_of_dvd this
+</juicy-ace-editor><div id='lean-full-code-18' style='display:none'>import data.nat
+open nat
+
+theorem even_add_of_even_of_even : ∀ {m n}, even m → even n → even (m + n) :=
+take m, take n,
+suppose even m,
+suppose even n,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ n, from dvd_of_even `even n`,
+have 2 ∣ m + n, from dvd_add `2 ∣ m` `2 ∣ n`,
+show even (m + n), from even_of_dvd this
+
+theorem even_of_even_add_left : ∀ {m n}, even (m + n) → even m → even n :=
+take m, take n,
+suppose even (m + n),
+suppose even m,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ (m + n), from dvd_of_even `even (m + n)`,
+have 2 ∣ n, from dvd_of_dvd_add_left `2 ∣ m + n` `2 ∣ m`,
+show even n, from even_of_dvd this
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-18').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+The curly braces around <code>m</code> and <code>n</code> in the first two theorems makes
+<code>m</code> and <code>n</code> <i>implicit arguments</i>, which means that you can write, for
+example, <code>even_add H₁ H₂</code> for hypotheses <code>H₁ : even m</code> and <code>H₂ : even
+n</code>, rather than <code>even_add m n H₁ H₂</code>. In fact, the first of these is 
+already in Lean's library:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-19' mode="ace/mode/lean" readonly="true">import data.nat
+open nat
+
+check even_add_of_even_of_even
+</juicy-ace-editor><div id='lean-full-code-19' style='display:none'>import data.nat
+open nat
+
+check even_add_of_even_of_even
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-19').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Using these, we can go on to prove the following:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-20' mode="ace/mode/lean" readonly="true">example : ∀ n, even n → odd (n + 1) :=
+take n,
+suppose even n,
+have ¬ even (n + 1), from
+  suppose even (n + 1),
+  have even 1, from even_of_even_add_left this `even n`,
+  have ¬ even 1, from not_even_of_odd odd_one,
+  show false, from `¬ even 1` `even 1`,
+show odd (n + 1), from odd_of_not_even this
+
+example : ∀ m n, even (m + n) → even n → even m :=
+sorry
+
+example : ∀ n, even (n + 1) → odd n :=
+sorry</juicy-ace-editor><div id='lean-full-code-20' style='display:none'>import data.nat
+open nat
+
+theorem even_of_even_add_left : ∀ {m n}, even (m + n) → even m → even n :=
+take m, take n,
+suppose even (m + n),
+suppose even m,
+have 2 ∣ m, from dvd_of_even `even m`,
+have 2 ∣ (m + n), from dvd_of_even `even (m + n)`,
+have 2 ∣ n, from dvd_of_dvd_add_left `2 ∣ m + n` `2 ∣ m`,
+show even n, from even_of_dvd this
+
+example : ∀ n, even n → odd (n + 1) :=
+take n,
+suppose even n,
+have ¬ even (n + 1), from
+  suppose even (n + 1),
+  have even 1, from even_of_even_add_left this `even n`,
+  have ¬ even 1, from not_even_of_odd odd_one,
+  show false, from `¬ even 1` `even 1`,
+show odd (n + 1), from odd_of_not_even this
+
+example : ∀ m n, even (m + n) → even n → even m :=
+sorry
+
+example : ∀ n, even (n + 1) → odd n :=
+sorry
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-20').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+The last two are left for you to do as exercises.
+</p>
+
+<p>
+Unfortunately, the facts we have presented to you so far do not let
+you prove that if <code>n</code> is odd, then <code>n+1</code> is even. Fortunately, that
+fact is also in the library (<code>succ</code> abbreviates "successor"), and you
+can use it to prove the second example below.
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-21' mode="ace/mode/lean" readonly="true">example (n : ℕ) (H : odd n) : even (n + 1) := 
+even_succ_of_odd H
+
+example (n : ℕ) (H : odd (n + 1)) : even n :=
+sorry</juicy-ace-editor><div id='lean-full-code-21' style='display:none'>import data.nat
+open nat
+
+example (n : ℕ) (H : odd n) : even (n + 1) := 
+even_succ_of_odd H
+
+example (n : ℕ) (H : odd (n + 1)) : even n :=
+sorry
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-21').text());">Try it yourself &raquo;</button></div>
+</div>
+
+<p>
+Let us close with some examples of elementary theorems of number
+theory. (These are all exercises in Chapter 1 of <i>An Introduction to
+the Theory of Numbers</i> by Niven and Zuckerman.) For the moment, we
+will loosen up a bit and not insist that every fact we use can be
+proved axiomatically; let us take, as "common knowledge," facts such
+as these:
+</p>
+<ul class="org-ul">
+<li>A number is even if and only if it can be expressed in as <img src="ltxpng/04_First_Order_Logic.org.temp_df83ccb7b8d19bf7e6ca5f0f20760167405b1636.png" alt="$2 n$" />, and
+odd if it can be expressed in the form <img src="ltxpng/04_First_Order_Logic.org.temp_68385224a3be0e0759dc58dba05a54b272a061df.png" alt="$2 n + 1$" />.</li>
+<li>A number is divisible by <img src="ltxpng/04_First_Order_Logic.org.temp_da6ed9b9900036b05a877ca9d7a2333a1f3e018f.png" alt="$k$" /> if and only if it leaves a remainder of
+0 when you divide it by <img src="ltxpng/04_First_Order_Logic.org.temp_da6ed9b9900036b05a877ca9d7a2333a1f3e018f.png" alt="$k$" />. In particular, of any <img src="ltxpng/04_First_Order_Logic.org.temp_da6ed9b9900036b05a877ca9d7a2333a1f3e018f.png" alt="$k$" /> consecutive
+numbers <img src="ltxpng/04_First_Order_Logic.org.temp_81af8b93adc76d8a63ce252fe42cb5a8ff6083c4.png" alt="$n, n + 1, n + 2, \ldots, n + (k - 1)$" />, at least one of them
+will be divisible by <img src="ltxpng/04_First_Order_Logic.org.temp_da6ed9b9900036b05a877ca9d7a2333a1f3e018f.png" alt="$k$" />.</li>
+<li>Expressed differently, if <img src="ltxpng/04_First_Order_Logic.org.temp_8b1cf21311986918b59f45bf94d822a2347111ac.png" alt="$k &amp;gt; 0$" />, then any natural number <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" /> can
+be expressed as <img src="ltxpng/04_First_Order_Logic.org.temp_35fd087c5798e62a0b6bbd8a0a26cc9c6f303563.png" alt="$n = k q + r$" />, where <img src="ltxpng/04_First_Order_Logic.org.temp_6f4a2eb820eeb71d6047f512997adf0c65f7c9e4.png" alt="$0 \le r &amp;lt; k$" />.</li>
+</ul>
+<p>
+The last fact is often known as the "quotient-remainder" theorem.
+</p>
+
+<hr  />
+<p>
+<b>Theorem.</b> The product of any three consecutive integers is divisible
+by 6.
+</p>
+
+<p>
+<b>Proof.</b> Denote the three integers by <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_d7f241b4fdffa094da7e8e52c5f4d04a46dc890d.png" alt="$n + 1$" />, and <img src="ltxpng/04_First_Order_Logic.org.temp_a44a1fe7c7a49fa29f6918a18beacbe0a1e459c3.png" alt="$n + 2$" />. Then
+either <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" /> or <img src="ltxpng/04_First_Order_Logic.org.temp_d7f241b4fdffa094da7e8e52c5f4d04a46dc890d.png" alt="$n + 1$" /> is divisible by 2, and either <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_d7f241b4fdffa094da7e8e52c5f4d04a46dc890d.png" alt="$n + 1$" />, or
+<img src="ltxpng/04_First_Order_Logic.org.temp_a44a1fe7c7a49fa29f6918a18beacbe0a1e459c3.png" alt="$n + 2$" /> is divisible by 3. So, their product is divisible by 6.
+</p>
+
+<p>
+<b>Theorem</b>. For every <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_33b0a0bff8c28a38de58a46312102f02a595df5a.png" alt="$n^3 - n$" /> is divisible by 6.
+</p>
+
+<p>
+<b>Proof.</b> We have <img src="ltxpng/04_First_Order_Logic.org.temp_0c932514acf5e8d858a33b9c2839add2e50ccdbc.png" alt="$n^3 - n = (n - 1) n (n + 1)$" />, which is a product of
+ three consecutive integers.
+</p>
+<hr  />
+
+<p>
+As exercises, try writing proving the following, informally:
+</p>
+<ul class="org-ul">
+<li>For any integer <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" />, <img src="ltxpng/04_First_Order_Logic.org.temp_4f3d99e56806cfafbfdef116afbd377f1dc743f7.png" alt="$n^2$" /> leaves a remainder of 0 or 1
+when you divide it by 4. Hence <img src="ltxpng/04_First_Order_Logic.org.temp_c05ba6cb7ee6918276c025a9122f6ac511494f80.png" alt="$n^2 + 2$" /> is never divisible by 4.</li>
+<li>If <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" /> is odd, <img src="ltxpng/04_First_Order_Logic.org.temp_6e681031a6c6083fb68f3342c7af381622c60dd1.png" alt="$n^2 - 1$" /> is divisible by 8.</li>
+<li>If <img src="ltxpng/04_First_Order_Logic.org.temp_5b0a1dfc616e3a54d5c3ca94d7bf0cad30343a1e.png" alt="$m$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" /> are odd, then <img src="ltxpng/04_First_Order_Logic.org.temp_e29b82b208e6648b51d792202af8b0f3f6609073.png" alt="$m^2 + n^2$" /> is even but not divisible
+by 4.</li>
+<li>Say that two integers "have the same parity" if they are both even
+or both odd. Prove that if <img src="ltxpng/04_First_Order_Logic.org.temp_5b0a1dfc616e3a54d5c3ca94d7bf0cad30343a1e.png" alt="$m$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" /> are any two integers, then
+<img src="ltxpng/04_First_Order_Logic.org.temp_cee1cba7107d427e06d2e0aec02eb7ed8f05df52.png" alt="$m + n$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_0131a3256c6c31ec8ca2f12f64b2b15ea854bcdf.png" alt="$m - n$" /> have the same parity.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5"><span class="section-number-3"> 4.5</span> Relativization and Sorts</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+In first-order logic as we have presented it, there is one intended
+"universe" of objects of discourse, and the universal and existential
+quantifiers range over that universe. For example, we could design a
+language to talk about people living in a certain town, with a
+relation <img src="ltxpng/04_First_Order_Logic.org.temp_6e744056021a15936c50440c6005673c81f26d89.png" alt="$\fn{loves}(x, y)$" /> to express that <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> loves <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" />. In such a
+language, we might express the statement that "everyone loves someone"
+by writing <img src="ltxpng/04_First_Order_Logic.org.temp_c4625e8769dcc3d1b128ce1001013442fb2bd0ae.png" alt="$\fa x \ex y \fn{loves}(x, y)$" />.
+</p>
+
+<p>
+You should keep in mind that, at this stage, <img src="ltxpng/04_First_Order_Logic.org.temp_e1dc2b53622504dbe53abb27bad477e09b90867b.png" alt="$\fn{loves}$" /> is just a
+symbol. We have designed the language with a certain interpretation in
+mind, but one could also interpret the language as making statements
+about the natural numbers, where <img src="ltxpng/04_First_Order_Logic.org.temp_6e744056021a15936c50440c6005673c81f26d89.png" alt="$\fn{loves}(x, y)$" /> means that <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is
+less than or equal to <img src="ltxpng/04_First_Order_Logic.org.temp_404e42bc95b30158622d309930c2468a6970e4df.png" alt="$y$" />. In that interpretation, the sentence
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_7cd6f45eddead58f39fcfe7d5b97f681706f5d00.png" alt="\begin{equation*}
+\fa {x, y, z} (\fn{loves}(x, y) \wedge \fn{loves}(y, z) \to
+\fn{loves}(x, z))
+\end{equation*}
+" /></p>
+</div>
+<p>
+is true, though in the original interpretation it makes an implausible
+claim about the nature of love triangles. In a later chapter, we will
+spell out the notion that the deductive rules of first-order logic
+enable us to determine the statements that are true in 
+interpretations, just as the rules of propositional logic enable us to
+determine the statements that are true under all truth assignments.
+</p>
+
+<p>
+Returning to the original example, suppose we want to represent the
+statement that, in our town, all the women are strong and all the men
+are good looking. We could do that with the following two sentences:
+</p>
+<ul class="org-ul">
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_6fd5f18b564089c98e56f471adf4346877c4ba7a.png" alt="$\fa x (\fn{woman}(x) \to \fn{strong}(x))$" /></li>
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_fcb51ee3f0d1afd7fc53d8e62e747e8c6af7a05e.png" alt="$\fa x (\fn{man}(x) \to \fn{good\mathord{-}looking}(x))$" /></li>
+</ul>
+<p>
+These are instances of <i>relativization</i>. The universal quantifier
+ranges over all the people in the town, but this device gives us a way
+of using implication to restrict the scope of our statements to men
+and women, respectively. The trick also comes into play when we render
+"every prime number greater than two is odd":
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_e792af09d6528e0b6e7b6a736e48f91bdf66bd19.png" alt="\begin{equation*}
+\fa x (\fn{prime}(x) \wedge x \ge 2 \to \fn{odd}(x)).
+\end{equation*}
+" /></p>
+</div>
+<p>
+We could also read this more literally as saying "for every number
+<img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />, if <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is prime and <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is greater than or equal to 2, then <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />
+is odd," but it is natural to read it as a restricted quantifier. It
+is also possible to relativize the existential quantifier to say
+things like "some woman is strong" and "some man is good-looking." We
+will see how to do this in a later chapter.
+</p>
+
+<p>
+Now, suppose we are studying geometry, and we want to express the fact
+that given any two distinct points <img src="ltxpng/04_First_Order_Logic.org.temp_2858735a231340e680882621d4595c9b3b4a03c3.png" alt="$p$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_c264b2ed5d72e92334e21fc5728fdf99b380eb1e.png" alt="$q$" /> and any two lines <img src="ltxpng/04_First_Order_Logic.org.temp_e021954682163d032a3c2a7efff86747732268a5.png" alt="$L$" />
+and <img src="ltxpng/04_First_Order_Logic.org.temp_5d4d610aeb221c8445f9e8c9aa7124d015056469.png" alt="$M$" />, if <img src="ltxpng/04_First_Order_Logic.org.temp_e021954682163d032a3c2a7efff86747732268a5.png" alt="$L$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_5d4d610aeb221c8445f9e8c9aa7124d015056469.png" alt="$M$" /> both pass through <img src="ltxpng/04_First_Order_Logic.org.temp_2858735a231340e680882621d4595c9b3b4a03c3.png" alt="$p$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_c264b2ed5d72e92334e21fc5728fdf99b380eb1e.png" alt="$q$" />, then they have
+to be the same. (In other words, there is at most one line between two
+distinct points.) One option is to design a first-order logic where the
+intended universe is big enough to include both points and lines, and
+use relativization:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_b1ceb619aa1d46205828d2702f6e53492a41efa0.png" alt="\begin{multline*}
+\fa {p, q, L, M} (\fn{point}(p) \wedge \fn{point}(q) \wedge
+\fn{line}(L) \wedge \fn{line}(M) \\
+\wedge \fn{on}(p,L) \wedge \fn{on}(q,L) \wedge \fn{on}(p,M) \wedge
+\fn{on}(q,M) \to L = M)
+\end{multline*}
+" /></p>
+</div>
+<p>
+But dealing with such predicates is tedious, and there is a mild
+extension of first-order logic, called <i>many-sorted first-order
+logic</i>, which builds in some of the bookkeeping. In many-sorted logic,
+one can have different sorts of objects &#x2014; such as points and lines
+&#x2014; and a separate stock of variables and quantifiers ranging over
+each. Moreover, the specification of function symbols and predicate
+symbols indicates what sorts of arguments they expect, and, in the
+case of function symbols, what sort of argument they return. For
+example, we might choose to have a sort with variables <img src="ltxpng/04_First_Order_Logic.org.temp_1a5803791587e510ff534b3e1015ba2009623663.png" alt="$p, q, r,
+\ldots$" /> ranging over points, a sort with variables <img src="ltxpng/04_First_Order_Logic.org.temp_e2c641c201800f6226cacdcce18b6f8c73b66804.png" alt="$L, M, N, \ldots$" />
+ranging over lines, and a relation <img src="ltxpng/04_First_Order_Logic.org.temp_1231a4d9d5aa607bde470990b2d472d341b9e2ea.png" alt="$\fn{on}(p, L)$" /> relating the
+two. Then the assertion above is rendered more simply as follows:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_e81e0c6b06492a12eacb9b80f9f5ab3b38ae498b.png" alt="\begin{equation*}
+\fa {p, q, L, M} (\fn{on}(p,L) \wedge \fn{on}(q,L) \wedge \fn{on}(p,M) \wedge
+\fn{on}(q,M) \to L = M)
+\end{equation*}
+" /></p>
+</div>
+
+<p>
+In Lean, we can model many-sorted logic by introducing a new type
+for each sort:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-22' mode="ace/mode/lean" readonly="true">variables Point Line : Type
+variable  on : Point → Line → Prop
+
+check ∀ (p q : Point) (L M : Line),
+	on p L → on q L → on p M → on q M → L = M
+</juicy-ace-editor><div id='lean-full-code-22' style='display:none'>variables Point Line : Type
+variable  on : Point → Line → Prop
+
+check ∀ (p q : Point) (L M : Line),
+	on p L → on q L → on p M → on q M → L = M
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-22').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Notice that we have followed the convention of using iterated
+implication rather than conjunction in the antecedent. In fact, Lean
+is smart enough to infer what sorts of objects <code>p</code>, <code>q</code>, <code>L</code>, and <code>M</code> 
+are from the fact that they are used with the relation <code>on</code>, so we
+could have written more simply this:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-23' mode="ace/mode/lean" readonly="true">check ∀ p q L M,
+	on p L → on q L → on p M → on q M → L = M</juicy-ace-editor><div id='lean-full-code-23' style='display:none'>variables Point Line : Type
+variable  on : Point → Line → Prop
+
+check ∀ p q L M,
+	on p L → on q L → on p M → on q M → L = M
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-23').text());">Try it yourself &raquo;</button></div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline6" class="outline-3">
+<h3 id="orgheadline6"><span class="section-number-3"> 4.6</span> Elementary Set Theory</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+In a publication in the journal <i>Mathematische Annalen</i> in 1895, the
+German mathematician Georg Cantor presented the following
+characterization of the notion of a "set" (or <i>Menge</i>, in his
+terminology):
+</p>
+<blockquote>
+<p>
+By a <i>set</i> we mean any collection M of determinate, distinct objects
+(called the <i>elements</i> of M) of our intuition or thought into a whole.
+</p>
+</blockquote>
+<p>
+Since then, the notion of a set has been used to unify a wide range of
+abstractions and constructions. Axiomatic set theory, which we will
+discuss in a later chapter, provides a foundation for mathematics in
+which everything can be viewed as a set.
+</p>
+
+<p>
+On a broad construal, <i>any</i> collection can be a set; for example, we
+can consider the set whose elements are Ringo Star, the number 7, and
+the set whose only member is the Empire State Building. With such a
+broad notion of set we have to be careful: Russell's paradox has us
+consider the set <img src="ltxpng/04_First_Order_Logic.org.temp_d86a67261b95325cbf4767cfaabf36bb5910a634.png" alt="$S$" /> of all sets that are not elements of themselves,
+which leads to a contradiction when we ask whether <img src="ltxpng/04_First_Order_Logic.org.temp_d86a67261b95325cbf4767cfaabf36bb5910a634.png" alt="$S$" /> is an element
+of itself. (Try it!) The axioms of set theory tell us what sets exist,
+and have been carefully designed to avoid paradoxical sets like that
+of the Russell paradox.
+</p>
+
+<p>
+In practice, mathematicians are not so freewheeling in their use of
+sets. Typically, one fixes a domain such as the natural numbers, and
+consider subsets of that domain. In other words, we consider sets of
+numbers, sets of points, sets of lines, and so on, rather than
+arbitrary "sets." In this text, we will adopt this convention: when we
+talk about sets, we are always implicitly talking about sets of
+elements of some domain.
+</p>
+
+<p>
+Cantor's characterization suggests that whenever we have some
+property, <img src="ltxpng/04_First_Order_Logic.org.temp_abd5d7efbf571e6a2d39a5ea6137d15142143223.png" alt="$P$" />, of a domain, we can form the set of elements that have
+that property. This is denoted using "set-builder notation" as <img src="ltxpng/04_First_Order_Logic.org.temp_80216600579f08bf948433ede53fd63f0eed3423.png" alt="$\{ x
+\; | \; P(x) \}$" />. For example, we can consider all the following sets
+of natural numbers:
+</p>
+<ul class="org-ul">
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_fb96c4fcf5e334c2c37cb6c56f6951bf1a286d31.png" alt="\( \{n \st \mbox{$n$ is even} \} \)" /></li>
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_a49548a2e88816ae05654277ba6d10218d7aeff8.png" alt="\( \{n \st \mbox{$n$ is prime} \} \)" /></li>
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_e0234c3566f0286e682271a9281fa57ff0fa4cce.png" alt="\( \{n \st \mbox{$n$ is prime and greater than 2} \} \)" /></li>
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_1c8310b8a8e954f43238e26e642bf0fa9c08b00a.png" alt="\( \{n \st \mbox{$n$ can be written as a sum of squares} \} \)" /></li>
+<li><img src="ltxpng/04_First_Order_Logic.org.temp_6b4cdd0bb884d3cfce4d016a1f4beb7145a98fe6.png" alt="\( \{n \st \mbox{$n$ is equal to 1, 2, or 3}\} \)" /></li>
+</ul>
+<p>
+This last set is written more simply <img src="ltxpng/04_First_Order_Logic.org.temp_4d72ee4b769ab46cc0c9c7a66d51e8fd9b32dc53.png" alt="$\{1, 2, 3\}$" />.
+</p>
+
+<p>
+Given a set <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> of objects in some domain and an object <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" />, we write
+<img src="ltxpng/04_First_Order_Logic.org.temp_fb0742aaf86a63feb043d2e15872a36a42d433f9.png" alt="$x \in A$" /> to say that <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is an element of <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />. Using set-builder
+notation, we can define a number of common sets and operations. The
+<i>empty set</i>, <img src="ltxpng/04_First_Order_Logic.org.temp_6955ea57396aa06dbf66beb3ea2121c99c4f03d5.png" alt="$\emptyset$" />, is the set with no elements:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_03e4ba4757171cf0776f26ba3d60e6206d17dd8f.png" alt="\begin{equation*}
+\emptyset = \{ x \st \mbox{false} \}
+\end{equation*}
+" /></p>
+</div>
+<p>
+Dually, we can define the <i>universal set</i>, <img src="ltxpng/04_First_Order_Logic.org.temp_5ac2fc61ae727ea1c458492dfe391e5b3dd3f1d8.png" alt="$\mathcal U$" />, to be the set
+consisting of every element of the domain:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_ae987fa11f4d5444b49df0dde03a1d611017747e.png" alt="\begin{equation*}
+\mathcal U = \{ x \st \mbox{true} \}
+\end{equation*}
+" /></p>
+</div>
+<p>
+Given to sets <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />, we define their <i>union</i> to be the set of
+elements in either one:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_ec8be4cbd1ed0ca60a1d71b8bfae32043b42ae3c.png" alt="\begin{equation*}
+A \cup B = \{ x \st \mbox{$x \in A$ or $x \in B$} \}
+\end{equation*}
+" /></p>
+</div>
+<p>
+And we define their <i>intersection</i> to be the set of elements of both:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_6a8d2bd69c66c2770b7920fff35479ece963dae6.png" alt="\begin{equation*}
+A \cap B = \{ x \st \mbox{$x \in A$ and $x \in B$} \}
+\end{equation*}
+" /></p>
+</div>
+<p>
+We define the <i>complement</i> of a set of <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> to be the set of elements
+that are not in <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_d1e869950a0992180cba2f0418fc932256022080.png" alt="\begin{equation*}
+\overline A = \{ x \st \mbox{$x \notin A$} \}
+\end{equation*}
+" /></p>
+</div>
+<p>
+We define the <i>set difference</i> of two sets <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> to be the set
+of elements in <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> but not <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_55ece038a7106e6c465f65dcbacc0201e20cd2b2.png" alt="\begin{equation*}
+A \setminus B = \{ x \st \mbox{$x \in A$ and $x \notin B$} \}
+\end{equation*}
+" /></p>
+</div>
+
+<p>
+Two sets are said to be equal if they have exactly the same
+elements. If <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> are sets, <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is said to be a <i>subset</i> of
+<img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />, written <img src="ltxpng/04_First_Order_Logic.org.temp_7740b7dfebbb2d072703c4cb26cf2d7b3905d789.png" alt="$A \subseteq B$" />, if every element of <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is an element of
+<img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />. Notice that <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is equal to <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> if and only if <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is a subset of
+<img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> is a subset of <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />.
+</p>
+
+<p>
+Notice also that just everything we have said about sets so far is
+readily representable in symbolic logic. We can render the defining
+properties of the basic sets and constructors as follows:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/04_First_Order_Logic.org.temp_516ab2b326fd418061101477fc9b251f5be82124.png" alt="\begin{align*}
+&amp;amp; \fa x (x \notin \emptyset) \\
+&amp;amp; \fa x (x \in \mathcal U) \\
+&amp;amp; \fa x (x \in A \cup B \liff x \in A \vee x \in B) \\
+&amp;amp; \fa x (x \in A \cap B \liff x \in A \wedge x \in B) \\
+&amp;amp; \fa x (x \in \overline A \liff x \notin A) \\
+&amp;amp; \fa x (x \in A \setminus B \liff x \in A \wedge x \notin B)
+\end{align*}
+" /></p>
+</div>
+<p>
+The assertion that <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is a subset of <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> can be written <img src="ltxpng/04_First_Order_Logic.org.temp_3a10b619b4097dcea64725294a0103f79a4e21a4.png" alt="$\fa x (x \in
+A \to x \in B)$" />, and the assertion that <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is equal to be can be
+written <img src="ltxpng/04_First_Order_Logic.org.temp_77c80b17ccd322be05503ccd68c0c6a49d2aeb9e.png" alt="$\fa x (x \in A \liff x \in B)$" />. These are all
+statements, that is, statements with universal
+quantifiers in front, followed by basic assertions and propositional
+connectives. What this means is that reasoning about sets formally
+often amounts to using nothing more than the rules for the universal
+quantifier together with the rules for propositional logic. You should
+by now be able to discern this formal structure underlying <i>informal</i>
+proofs as well. Here are two examples.
+</p>
+
+<hr  />
+
+<p>
+Let <img src="ltxpng/04_First_Order_Logic.org.temp_dbfeb1525c6641bac8542747bdbdcdff87f2d179.png" alt="$A, B, C, \ldots$" /> denotes sets of elements of some domain, <img src="ltxpng/04_First_Order_Logic.org.temp_98322274de1ba73ad29ee8654f040f2e9b5fa93d.png" alt="$X$" />.
+</p>
+
+<p>
+<b>Theorem</b>. <img src="ltxpng/04_First_Order_Logic.org.temp_e3cae2e0731c354127b31450bf5fb61b4b7e2983.png" alt="$A \cap (B \cup C) = (A \cap B) \cup (A \cap C)$" />.
+</p>
+
+<p>
+<b>Proof</b>. Suppose <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_f32e9295578cc0553091b0d2dcefec00f2701ae3.png" alt="$A \cap (B \cup C)$" />. Then <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />,
+and either <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> or <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_d5420fe138f4d39b6f52f71250e99e0a36aaaab5.png" alt="$C$" />. In the first case, <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is
+in <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />, and hence in <img src="ltxpng/04_First_Order_Logic.org.temp_f27c09993f98bac9ed38840f1a4ab67486fc6205.png" alt="$A \cap B$" />. In the second case, <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in
+<img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_d5420fe138f4d39b6f52f71250e99e0a36aaaab5.png" alt="$C$" />, and hence <img src="ltxpng/04_First_Order_Logic.org.temp_c2544b7abaf83d98afbf58467a55218c41f248fe.png" alt="$A \cap C$" />. Either way, we have that <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in
+<img src="ltxpng/04_First_Order_Logic.org.temp_5014148930806621d770ce0b3d486351cb574cb7.png" alt="$(A \cap B) \cup (A \cap C)$" />.
+</p>
+
+<p>
+Conversely, suppose <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_5014148930806621d770ce0b3d486351cb574cb7.png" alt="$(A \cap B) \cup (A \cap C)$" />. There are
+now two cases. 
+</p>
+
+<p>
+First, suppose <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_f27c09993f98bac9ed38840f1a4ab67486fc6205.png" alt="$A \cap B$" />. Then <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in both <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> and
+<img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />. Since <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />, it is also in <img src="ltxpng/04_First_Order_Logic.org.temp_7d0cd97551586db55999da63f11eff7e0254e88d.png" alt="$B \cup C$" />, and so <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in
+<img src="ltxpng/04_First_Order_Logic.org.temp_f32e9295578cc0553091b0d2dcefec00f2701ae3.png" alt="$A \cap (B \cup C)$" />.
+</p>
+
+<p>
+The second case is similar: suppose <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_c2544b7abaf83d98afbf58467a55218c41f248fe.png" alt="$A \cap C$" />. Then <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is
+in both <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> and <img src="ltxpng/04_First_Order_Logic.org.temp_d5420fe138f4d39b6f52f71250e99e0a36aaaab5.png" alt="$C$" />, and so also in <img src="ltxpng/04_First_Order_Logic.org.temp_7d0cd97551586db55999da63f11eff7e0254e88d.png" alt="$B \cup C$" />. Hence, in this case
+also, <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_f32e9295578cc0553091b0d2dcefec00f2701ae3.png" alt="$A \cap (B \cup C)$" />, as required.
+</p>
+
+<hr  />
+
+<hr  />
+<p>
+<b>Theorem</b>. <img src="ltxpng/04_First_Order_Logic.org.temp_074b27c4820a82be8ce7c08e7a03b748631425dc.png" alt="$(A \setminus B) \setminus C = A \setminus (B \cup C)$" />.
+</p>
+
+<p>
+<b>Proof</b>. Suppose <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_7a948675f1940ef2dca3b6ca71c8a938103c30c2.png" alt="$(A \setminus B) \setminus C$" />. Then <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is
+in <img src="ltxpng/04_First_Order_Logic.org.temp_861e38bf5a4bc86446184857427690e2b10ea33d.png" alt="$A \setminus B$" /> but not <img src="ltxpng/04_First_Order_Logic.org.temp_d5420fe138f4d39b6f52f71250e99e0a36aaaab5.png" alt="$C$" />, and hence it is in <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> but not <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> or
+<img src="ltxpng/04_First_Order_Logic.org.temp_d5420fe138f4d39b6f52f71250e99e0a36aaaab5.png" alt="$C$" />. This means that <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> but not <img src="ltxpng/04_First_Order_Logic.org.temp_7d0cd97551586db55999da63f11eff7e0254e88d.png" alt="$B \cup C$" />, and so in <img src="ltxpng/04_First_Order_Logic.org.temp_2b443f744b2fe081589cc74dc585498f81d613be.png" alt="$A
+\setminus (B \cup C)$" />.
+</p>
+
+<p>
+Conversely, suppose <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_4ee13b3fb8360593c393c6ee1096356b727425b2.png" alt="$A \setminus (B \cup C)$" />. Then <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in
+<img src="ltxpng/04_First_Order_Logic.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />, but not in <img src="ltxpng/04_First_Order_Logic.org.temp_7d0cd97551586db55999da63f11eff7e0254e88d.png" alt="$B \cup C$" />. In particular, <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in neither <img src="ltxpng/04_First_Order_Logic.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> nor
+<img src="ltxpng/04_First_Order_Logic.org.temp_d5420fe138f4d39b6f52f71250e99e0a36aaaab5.png" alt="$C$" />, because otherwise it would be in <img src="ltxpng/04_First_Order_Logic.org.temp_7d0cd97551586db55999da63f11eff7e0254e88d.png" alt="$B \cup C$" />. So <img src="ltxpng/04_First_Order_Logic.org.temp_d264ca80e3657ef30d95cfb1f0aa642d82f53bfd.png" alt="$x$" /> is in <img src="ltxpng/04_First_Order_Logic.org.temp_06f9a251bc55b25695241acb3e9b05867bcb75b5.png" alt="$A
+\setminus B$" />, and hence <img src="ltxpng/04_First_Order_Logic.org.temp_7a948675f1940ef2dca3b6ca71c8a938103c30c2.png" alt="$(A \setminus B) \setminus C$" />.
+</p>
+
+<hr  />
+
+<p>
+You can carry out such reasoning in Lean, using methods you have
+already seen. For any type <code>X</code>, Lean gives us a type, <code>set X</code>, of sets
+of elements of <code>X</code>, with the element-of relation <code>x ∈ A</code>. We need only
+import the library file <code>data.set</code> and open the "namespace" set to
+have the notions and notations made available to us.
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-24' mode="ace/mode/lean" readonly="true">import data.set
+open set
+
+variable {X : Type}
+variables A B C : set X
+</juicy-ace-editor><div id='lean-full-code-24' style='display:none'>import data.set
+open set
+
+variable {X : Type}
+variables A B C : set X
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-24').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+We have made the type variable <code>X</code> implicit, because it can usually be
+inferred from context. The following pattern can be used to show that
+<code>A</code> is a subset of <code>B</code>:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-25' mode="ace/mode/lean" readonly="true">example : A ⊆ B :=
+take x,
+assume H : x ∈ A,
+show x ∈ B, from sorry</juicy-ace-editor><div id='lean-full-code-25' style='display:none'>import data.set
+open set
+
+variable {X : Type}
+variables A B C : set X
+
+example : A ⊆ B :=
+take x,
+assume H : x ∈ A,
+show x ∈ B, from sorry
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-25').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+And the following pattern be used to show that <code>A</code> and <code>B</code> are equal:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-26' mode="ace/mode/lean" readonly="true">example : A = B :=
+eq_of_subset_of_subset
+  (take x,
+    assume H : x ∈ A,
+    show x ∈ B, from sorry)
+  (take x,
+    assume H : x ∈ B,
+    show x ∈ A, from sorry)</juicy-ace-editor><div id='lean-full-code-26' style='display:none'>import data.set
+open set
+
+variable {X : Type}
+variables A B C : set X
+
+example : A = B :=
+eq_of_subset_of_subset
+  (take x,
+    assume H : x ∈ A,
+    show x ∈ B, from sorry)
+  (take x,
+    assume H : x ∈ B,
+    show x ∈ A, from sorry)
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-26').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Moreover, Lean supports the following nifty feature: all of the
+equivalences above are considered to hold "definitionally," which is
+to say, in most situations you can treat and the left- and
+right-hand-sides as being the same. In other words, you can act as
+though the expression <code>x ∈ A ∩ B</code> is no different from <code>x ∈ A ∧ x ∈
+B</code>, and similarly for the other constructors.
+</p>
+
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-27' mode="ace/mode/lean" readonly="true">example : ∀ x, x ∈ A → x ∈ B → x ∈ A ∩ B :=
+take x, 
+suppose x ∈ A,
+suppose x ∈ B,
+show x ∈ A ∩ B, from and.intro `x ∈ A` `x ∈ B`
+
+example : ∀ x : X, x ∉ ∅ :=
+take x, 
+suppose x ∈ ∅, 
+show false, from this</juicy-ace-editor><div id='lean-full-code-27' style='display:none'>import data.set
+open set
+
+variable {X : Type}
+variables A B C : set X
+
+example : ∀ x, x ∈ A → x ∈ B → x ∈ A ∩ B :=
+take x, 
+suppose x ∈ A,
+suppose x ∈ B,
+show x ∈ A ∩ B, from and.intro `x ∈ A` `x ∈ B`
+
+example : ∀ x : X, x ∉ ∅ :=
+take x, 
+suppose x ∈ ∅, 
+show false, from this
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-27').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+In the second example, we annotated <code>x</code> with its type, <code>X</code>, because
+otherwise there is not enough information for Lean to infer which
+"empty set" we have in mind. You can type the symbols <code>⊆</code>, <code>∅</code>, <code>∪</code>,
+<code>∩</code>, <code>\</code> as <code>\subeq</code> <code>\empty</code>, <code>\un</code>, <code>\i</code>, and <code>\\</code>,
+respectively. The universal set is denoted <code>univ</code>, and set
+complementation is denoted with a negation symbol.
+</p>
+
+<p>
+The identifications above make it easy to prove some containment
+relations:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-28' mode="ace/mode/lean" readonly="true">example : A \ B ⊆ A :=
+take x,
+suppose x ∈ A \ B,
+show x ∈ A, from and.left this
+
+example : A \ B ⊆ -B :=
+take x,
+suppose x ∈ A \ B,
+have x ∉ B, from and.right this,
+show x ∈ -B, from this</juicy-ace-editor><div id='lean-full-code-28' style='display:none'>import data.set
+open set
+
+variable {X : Type}
+variables A B C : set X
+
+example : A \ B ⊆ A :=
+take x,
+suppose x ∈ A \ B,
+show x ∈ A, from and.left this
+
+example : A \ B ⊆ -B :=
+take x,
+suppose x ∈ A \ B,
+have x ∉ B, from and.right this,
+show x ∈ -B, from this
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-28').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Here is the proof of the first identity that we proved informally
+above:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-29' mode="ace/mode/lean" readonly="true">example : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) :=
+eq_of_subset_of_subset
+  (take x,
+    assume H : x ∈ A ∩ (B ∪ C),
+    have x ∈ A, from and.left H,
+    have x ∈ B ∪ C, from and.right H,
+    or.elim (`x ∈ B ∪ C`)
+      (suppose x ∈ B,
+	have x ∈ A ∩ B, from and.intro `x ∈ A` `x ∈ B`,
+	show x ∈ (A ∩ B) ∪ (A ∩ C), from or.inl this)
+      (suppose x ∈ C,
+	have x ∈ A ∩ C, from and.intro `x ∈ A` `x ∈ C`,
+	show x ∈ (A ∩ B) ∪ (A ∩ C), from or.inr this))
+  (take x,
+    suppose x ∈ (A ∩ B) ∪ (A ∩ C),
+    or.elim this
+      (assume H : x ∈ A ∩ B,
+	have x ∈ A, from and.left H,
+	have x ∈ B, from and.right H,
+	have x ∈ B ∪ C, from or.inl this,
+	show x ∈ A ∩ (B ∪ C), from and.intro `x ∈ A` this)
+      (assume H : x ∈ A ∩ C,
+	have x ∈ A, from and.left H,
+	have x ∈ C, from and.right H,
+	have x ∈ B ∪ C, from or.inr this,
+	show x ∈ A ∩ (B ∪ C), from and.intro `x ∈ A` this))</juicy-ace-editor><div id='lean-full-code-29' style='display:none'>import data.set
+open set
+
+variable {X : Type}
+variables A B C : set X
+
+example : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) :=
+eq_of_subset_of_subset
+  (take x,
+    assume H : x ∈ A ∩ (B ∪ C),
+    have x ∈ A, from and.left H,
+    have x ∈ B ∪ C, from and.right H,
+    or.elim (`x ∈ B ∪ C`)
+      (suppose x ∈ B,
+	have x ∈ A ∩ B, from and.intro `x ∈ A` `x ∈ B`,
+	show x ∈ (A ∩ B) ∪ (A ∩ C), from or.inl this)
+      (suppose x ∈ C,
+	have x ∈ A ∩ C, from and.intro `x ∈ A` `x ∈ C`,
+	show x ∈ (A ∩ B) ∪ (A ∩ C), from or.inr this))
+  (take x,
+    suppose x ∈ (A ∩ B) ∪ (A ∩ C),
+    or.elim this
+      (assume H : x ∈ A ∩ B,
+	have x ∈ A, from and.left H,
+	have x ∈ B, from and.right H,
+	have x ∈ B ∪ C, from or.inl this,
+	show x ∈ A ∩ (B ∪ C), from and.intro `x ∈ A` this)
+      (assume H : x ∈ A ∩ C,
+	have x ∈ A, from and.left H,
+	have x ∈ C, from and.right H,
+	have x ∈ B ∪ C, from or.inr this,
+	show x ∈ A ∩ (B ∪ C), from and.intro `x ∈ A` this))
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-29').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Notice that it is considerably longer than the informal proof above,
+because we have spelled out every last detail, though it may not be
+more readable. Keep in mind that you can always write long proofs
+incrementally, using <code>sorry</code>. You can also break up long proofs into
+smaller pieces:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-30' mode="ace/mode/lean" readonly="true">proposition inter_union_subset : A ∩ (B ∪ C) ⊆ (A ∩ B) ∪ (A ∩ C) :=
+take x,
+assume H : x ∈ A ∩ (B ∪ C),
+have x ∈ A, from and.left H,
+have x ∈ B ∪ C, from and.right H,
+or.elim (`x ∈ B ∪ C`)
+  (suppose x ∈ B,
+    have x ∈ A ∩ B, from and.intro `x ∈ A` `x ∈ B`,
+    show x ∈ (A ∩ B) ∪ (A ∩ C), from or.inl this)
+  (suppose x ∈ C,
+    have x ∈ A ∩ C, from and.intro `x ∈ A` `x ∈ C`,
+    show x ∈ (A ∩ B) ∪ (A ∩ C), from or.inr this)
+
+proposition inter_union_inter_subset : (A ∩ B) ∪ (A ∩ C) ⊆ A ∩ (B ∪ C) :=
+take x,
+suppose x ∈ (A ∩ B) ∪ (A ∩ C),
+or.elim this
+  (assume H : x ∈ A ∩ B,
+    have x ∈ A, from and.left H,
+    have x ∈ B, from and.right H,
+    have x ∈ B ∪ C, from or.inl this,
+    show x ∈ A ∩ (B ∪ C), from and.intro `x ∈ A` this)
+  (assume H : x ∈ A ∩ C,
+    have x ∈ A, from and.left H,
+    have x ∈ C, from and.right H,
+    have x ∈ B ∪ C, from or.inr this,
+    show x ∈ A ∩ (B ∪ C), from and.intro `x ∈ A` this)
+
+example : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) :=
+eq_of_subset_of_subset
+  (inter_union_subset A B C)
+  (inter_union_inter_subset A B C)</juicy-ace-editor><div id='lean-full-code-30' style='display:none'>import data.set
+open set
+
+variable {X : Type}
+variables A B C : set X
+
+proposition inter_union_subset : A ∩ (B ∪ C) ⊆ (A ∩ B) ∪ (A ∩ C) :=
+take x,
+assume H : x ∈ A ∩ (B ∪ C),
+have x ∈ A, from and.left H,
+have x ∈ B ∪ C, from and.right H,
+or.elim (`x ∈ B ∪ C`)
+  (suppose x ∈ B,
+    have x ∈ A ∩ B, from and.intro `x ∈ A` `x ∈ B`,
+    show x ∈ (A ∩ B) ∪ (A ∩ C), from or.inl this)
+  (suppose x ∈ C,
+    have x ∈ A ∩ C, from and.intro `x ∈ A` `x ∈ C`,
+    show x ∈ (A ∩ B) ∪ (A ∩ C), from or.inr this)
+
+proposition inter_union_inter_subset : (A ∩ B) ∪ (A ∩ C) ⊆ A ∩ (B ∪ C) :=
+take x,
+suppose x ∈ (A ∩ B) ∪ (A ∩ C),
+or.elim this
+  (assume H : x ∈ A ∩ B,
+    have x ∈ A, from and.left H,
+    have x ∈ B, from and.right H,
+    have x ∈ B ∪ C, from or.inl this,
+    show x ∈ A ∩ (B ∪ C), from and.intro `x ∈ A` this)
+  (assume H : x ∈ A ∩ C,
+    have x ∈ A, from and.left H,
+    have x ∈ C, from and.right H,
+    have x ∈ B ∪ C, from or.inr this,
+    show x ∈ A ∩ (B ∪ C), from and.intro `x ∈ A` this)
+
+example : A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) :=
+eq_of_subset_of_subset
+  (inter_union_subset A B C)
+  (inter_union_inter_subset A B C)
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-30').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Notice that the two propositions depend on the variables <code>A</code>, <code>B</code>, and
+<code>C</code>, which have to be supplied as arguments when they are
+applied. They also depend on the underlying type, <code>X</code>, but because the
+variable <code>X</code> was marked implicit, Lean figures it out from the
+context.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

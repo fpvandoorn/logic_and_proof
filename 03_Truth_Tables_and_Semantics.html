@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2015-09-03 Thu 18:25 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>Logic and Proof</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="[[http://www.andrew.cmu.edu/user/avigad][Jeremy Avigad]]Jeremy Avigad, [[http://https://www.andrew.cmu.edu/user/rlewis1/][Robert Y. Lewis]]Robert Y. Lewis,  [[http://http://www.contrib.andrew.cmu.edu/~fpv/][Floris van Doorn]]Floris van Doorn" />
+<link rel="stylesheet" href="css/tutorial.css"/>
+<link rel="stylesheet" href="css/code.css"/>
+<script type="text/javascript" charset="utf-8">if(!window.PolymerGestures) { var head = document.getElementsByTagName('head')[0]; var js = document.createElement("script"); js.type = "text/javascript"; js.src = "//cdn.jsdelivr.net/polymer.platform/0.4.2/platform.js"; head.appendChild(js); } </script>
+<link rel='import' href='juicy-ace-editor.html'/>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Logic and Proof</h1>
+
+<div id="outline-container-orgheadline6" class="outline-2">
+<h2 id="Truth_Tables_and_Semantics"><a id="orgheadline6"></a><span class="section-number-2"> 3</span> Truth Tables and Semantics</h2>
+<div class="outline-text-2" id="text-Truth_Tables_and_Semantics">
+<p>
+In the last chapter, we saw how to prove a formula of propositional
+logic from hypotheses. Some formulas are provable outright, from no
+hypotheses at all, such as the formula <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_585c86a387e7ad9adf7775bb8281afb8d761dbd1.png" alt="$A \to A$" />.
+</p>
+
+<p>
+It seems intuitively clear that, in contrast, we cannot prove the
+formula <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_3a9090234befeadc30f2545de2a44cc4fe6badf4.png" alt="$A \to B$" /> without additional assumptions. Try it in Lean:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-1' mode="ace/mode/lean" readonly="true">variables A B : Prop
+
+example : A → B :=
+assume H : A,
+show B, from sorry
+</juicy-ace-editor><div id='lean-full-code-1' style='display:none'>variables A B : Prop
+
+example : A → B :=
+assume H : A,
+show B, from sorry
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-1').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+It should seem unlikely that there is an argument we could put in
+place of the "sorry" to complete this proof. After all, <code>B</code> could be
+false!
+</p>
+
+<p>
+What do we mean by "false," exactly? We used the identifiers <code>true</code>
+and <code>false</code> to denote certain propositions in Lean, but here we are
+using the words in a difference sense, as values, or judgments, we
+can assign to propositional formulas. Such evaluations belong to the
+realm of <i>semantics</i>. Formulas and formal proofs are <i>syntactic</i>
+notions, which is to say, they are represented by symbols and symbolic
+structures. Truth is a <i>semantic</i> notion, in that it ascribes a type
+of <i>meaning</i> to certain formulas.
+</p>
+
+<p>
+Syntactically, we were able to ask and answer questions like the
+following:
+</p>
+<ul class="org-ul">
+<li>Given a set of hypotheses, <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />, and a formula, <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />, can we
+drive <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> from <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />?</li>
+<li>What formulas can be derived from <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />?</li>
+<li>What hypotheses are need to derive <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />?</li>
+</ul>
+
+<p>
+The questions we consider semantically are different:
+</p>
+<ul class="org-ul">
+<li>Given an assignment of truth values to the propositional
+variables occuring in a formula <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />, is <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> true or false?</li>
+<li>Is there any truth assignment that makes <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> true?</li>
+<li>Which are the truth assignments that make <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> true?</li>
+</ul>
+
+<p>
+These syntactic and semantic notions complement each other, in ways we
+will describe below. But first, we will discuss methods we can use to
+answer semantic questions like the ones above.
+</p>
+</div>
+
+<div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="orgheadline1"><span class="section-number-3"> 3.1</span> Truth values and assignments</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The first notion we will need is that of a <i>truth value</i>. We have
+already seen two, namely, "true" and "false." We will use the symbols
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" /> and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f961bd9aef5a084f49c224d8decb036b163a48f6.png" alt="$\false$" /> in informal mathematics. These are the values
+that <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_5e63c8abf3b0c42012365b5702f80124df3a70e4.png" alt="$\top$" /> and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_7bea1d03799b42f9b799647895fded7894b866bd.png" alt="$\bot$" /> are intended to denote in natural deduction,
+and <code>true</code> and <code>false</code> are intended to denote in Lean.
+</p>
+
+<p>
+In this text, we will adopt a "classical" notion of truth, following
+our discussion in Section <a href="#" onclick="myModule.loadTutorial('02_Propositional_Logic.html', 'MissingReference')">Classical Reasoning</a>. This can be understood
+in various ways, but, concretely, it comes down to this: we will
+assume that any proposition is either true or false, but not
+both. This conception of truth is what underlies the law of the
+excluded middle, <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_648f455393860e148fb987e1e4bdf6b4da52b1b1.png" alt="$A \vee \neg A$" />. Semantically, we read this sentence
+as saying "either <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is true, or <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_c9fc0b9f87a04276e5274737b465662205a69233.png" alt="$\neg A$" /> is true." Since, in our
+semantic interpretation, <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_c9fc0b9f87a04276e5274737b465662205a69233.png" alt="$\neg A$" /> is true exactly when <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is false,
+the law of the excluded middle says that <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is either true or false.
+</p>
+
+<p>
+The next notion we will need is that of a <i>truth assignment</i>, which is
+simply a function that assigns a truth value to each element of a
+propositional variables. For example, the function <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_fed9b4c440a2111c9d9789476a6a073e5c7cbda9.png" alt="$v$" /> defined by
+</p>
+
+<ul class="org-ul">
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_9a15ba12bad521c857952e333f8b57a5fab17815.png" alt="$v(A) := \true$" /></li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_6e1915e28b505ffdc25e25f265252ccdb491564b.png" alt="$v(B) := \false$" /></li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_71422ea29ec319394172e690a30769d7683d5444.png" alt="$v(C) := \false$" /></li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_968a6e6acbd4874939ce03e622388d218839a66b.png" alt="$v(D) := \true$" /></li>
+</ul>
+
+<p>
+is a truth assignment for the set of variables <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_dc774f359163d2e66c04f02343b7660d3391c4a4.png" alt="$\{ A, B, C, D \}$" />. 
+</p>
+
+<p>
+Intuitively, a truth assignment describes a possible "state of the
+world." Going back to the Malice and Alice puzzle, let's suppose the
+following letters are shorthand for the statements:
+</p>
+
+<ul class="org-ul">
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_abd5d7efbf571e6a2d39a5ea6137d15142143223.png" alt="$P$" /> := Alice's brother was the victim</li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_1e3899392064ea39d646045be760d7c682f1c622.png" alt="$Q$" /> := Alice was the killer</li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_dfa41f9d3e75a0893a006d4e6c05b957dd59673e.png" alt="$R$" /> := Alice was in the bar</li>
+</ul>
+
+<p>
+In the world described by the solution to the puzzle, the first and
+third statements are true, and the second is false. So our truth
+assignment gives the value <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" /> to <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_abd5d7efbf571e6a2d39a5ea6137d15142143223.png" alt="$P$" /> and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_dfa41f9d3e75a0893a006d4e6c05b957dd59673e.png" alt="$R$" />, and the value
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f961bd9aef5a084f49c224d8decb036b163a48f6.png" alt="$\false$" /> to <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_1e3899392064ea39d646045be760d7c682f1c622.png" alt="$Q$" />.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-3">
+<h3 id="orgheadline2"><span class="section-number-3"> 3.2</span> Evaluating Formulas</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Once we have a truth assignment <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_fed9b4c440a2111c9d9789476a6a073e5c7cbda9.png" alt="$v$" /> to a set of propositional
+variables, we can extend it to a <i>valuation function</i> <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_6985ea375e881a430cdb17e80ad6f6f77abaede4.png" alt="$\bar v$" />, which
+assigns a value of true or false to every propositional formula that
+depends only on these variables. The function <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_6985ea375e881a430cdb17e80ad6f6f77abaede4.png" alt="$\bar v$" /> is defined
+recursively, which is to say, formulas are evaluated from the bottom
+up, so that value assigned to a compound formula is determined by the
+values assigned to its components. Formally, the function is defined
+as follows:
+</p>
+<ul class="org-ul">
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_03d0eeff6a2bc726976f93b5caa670fe69fbf62c.png" alt="$\bar v(\top) = \true$" /></li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_ba8c197b6bfc30239c5cce0e9cc1ed5281827be9.png" alt="$\bar v(\bot) = \false$" /></li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_455a499f570a58b8a9ffc1c41231b18068152fee.png" alt="$\bar v(\ell) = v(\ell)$" />, where <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_357826645657796a2c57aebc756663885a264ddb.png" alt="$\ell$" /> is any propositional variable.</li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_62164c8582a1b808f3afa272e133d65a8a5fff73.png" alt="$\bar v(\neg \varphi) = \true$" /> if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_045d23e7be441156fd9965ca850e24bca6fe1a10.png" alt="$\bar v(\varphi)$" /> is <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f961bd9aef5a084f49c224d8decb036b163a48f6.png" alt="$\false$" />, and vice
+versa.</li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_aad1f7e176396667b9f62e3d861846789e9746f5.png" alt="$\bar v(\varphi \wedge \psi) = \true$" /> if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_045d23e7be441156fd9965ca850e24bca6fe1a10.png" alt="$\bar v(\varphi)$" /> and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_939eb9bcf422636d6da792441517da028ea17f3a.png" alt="$\bar
+  v(\psi)$" /> are both <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" />, and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f961bd9aef5a084f49c224d8decb036b163a48f6.png" alt="$\false$" /> otherwise.</li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_aa06a6fdd2de7e6f9d16a55a7020e2b4c0caee1a.png" alt="$\bar v(\varphi \vee \psi) = \true$" /> if at least one of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_045d23e7be441156fd9965ca850e24bca6fe1a10.png" alt="$\bar v(\varphi)$" /> and
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_a5006f68d0fb32c2fa204760ef46cec94afbb4b5.png" alt="$\bar v(\psi)$" /> is <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" />; otherwise <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f961bd9aef5a084f49c224d8decb036b163a48f6.png" alt="$\false$" />.</li>
+<li><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f0119cfadfac497840c9721bfa45dabe7a5031b0.png" alt="$\bar v(\varphi \to \psi) = \true$" /> if either <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_a5006f68d0fb32c2fa204760ef46cec94afbb4b5.png" alt="$\bar v(\psi)$" /> is <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" /> or
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_045d23e7be441156fd9965ca850e24bca6fe1a10.png" alt="$\bar v(\varphi)$" /> is <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f961bd9aef5a084f49c224d8decb036b163a48f6.png" alt="$\false$" />, and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f961bd9aef5a084f49c224d8decb036b163a48f6.png" alt="$\false$" /> otherwise. (Equivalently,
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_8550a4b8734560745f1bfb25bc4825bb10ef35f4.png" alt="$\bar v(\varphi \to \psi) = \false$" /> if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_045d23e7be441156fd9965ca850e24bca6fe1a10.png" alt="$\bar v(\varphi)$" /> is <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" /> and
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_a5006f68d0fb32c2fa204760ef46cec94afbb4b5.png" alt="$\bar v(\psi)$" /> is <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f961bd9aef5a084f49c224d8decb036b163a48f6.png" alt="$\false$" />, and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" /> otherwise.)</li>
+</ul>
+
+<p>
+The rules for conjunction and disjunction are easy to understand. "A
+and B" is true exactly when A and B are both true; "A or B" is true when
+at least one of A or B is true.
+</p>
+
+<p>
+Understanding the rule for implication is trickier. People are often
+surprised to hear that any if-then statement with a false hypothesis
+is supposed to be true. The statement "if I have two heads, then
+circles are squares" may sound like it ought to be false, but by our
+reckoning, it comes out true. To make sense of this, think about the
+difference between the two sentences:
+</p>
+<ul class="org-ul">
+<li>"If I have two heads, then circles are squares."</li>
+<li>"If I had two heads, then circles would be squares."</li>
+</ul>
+<p>
+The second sentence is an example of a <i>counterfactual</i>
+implication. It asserts something about how the world might change, if
+things were other than they actually are. Philosophers have studied
+counterfactuals for centuries, but mathematical logic is concerned
+with the first sentence, a <i>material</i> implication. The material
+implication asserts something about the way the world is right now,
+rather than the way it might have been. Since it is false that I
+have two heads, the statement "if I have two heads, then circles are
+squares" is true.
+</p>
+
+<p>
+Why do we evaluate material implication in this way? Once again, let
+us consider the true sentence "every natural number that is prime and
+greater than two is odd." We can interpret this sentence as saying
+that all of the (infinitely many) sentences in this list are true:
+</p>
+<ul class="org-ul">
+<li>if 0 is prime and greater than 2, then 0 is odd</li>
+<li>if 1 is prime and greater than 2, then 1 is odd</li>
+<li>if 2 is prime and greater than 2, then 2 is odd</li>
+<li>if 3 is prime and greater than 2, then 3 is odd</li>
+<li>&#x2026;</li>
+</ul>
+
+<p>
+The first sentence on this list is a lot like our "two heads" example,
+since both the hypothesis and the conclusion are false. But since it
+is an instance of a statement that is true in general, we are
+committed to assigning it the value <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" />.  The second sentence is a
+different: the hypothesis is still false, but here the conclusion is
+true. Together, these tell us that whenever the hypothesis is false,
+the conditional statement should be true. The fourth sentence has a
+true hypothesis and a true conclusion. So from the second and fourth
+sentences, we see that whenever the conclusion is true, the
+conditional should be true as well.  Finally, it seems clear that the
+sentence "if 3 is prime and greater than 2, then 3 is even" should
+<i>not</i> be true. This pattern, where the hypothesis is true and the
+conclusion is false, is the only one for which the conditional will be
+false.
+</p>
+
+<p>
+Let us motivate the semantics for material implication another way,
+using the deductive rules described in the last chapter. Notice that,
+if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> is true, we can prove <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_3a9090234befeadc30f2545de2a44cc4fe6badf4.png" alt="$A \to B$" /> without any assumptions about
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />.
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_82e3652190bf8a62ab8725c27a3d0be0ce361969.png" alt="\begin{prooftree}
+\AXM{B}
+\UIM{A \to B}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+This follows from the proper reading of the implication introduction
+rule: given <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />, one can always infer <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_3a9090234befeadc30f2545de2a44cc4fe6badf4.png" alt="$A \to B$" />, and then cancel an
+assumption <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />, . If <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> was never used in the
+proof, the conclusion is simply weaker than it needs to be. This
+inference is validated in Lean:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-2' mode="ace/mode/lean" readonly="true">variables A B : Prop
+premise HB : B
+
+example : A → B :=
+assume HA : A, 
+  show B, from HB
+</juicy-ace-editor><div id='lean-full-code-2' style='display:none'>variables A B : Prop
+premise HB : B
+
+example : A → B :=
+assume HA : A, 
+  show B, from HB
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-2').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Similarly, if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is false, we can prove <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_3a9090234befeadc30f2545de2a44cc4fe6badf4.png" alt="$A \to B$" /> without any
+assumptions about <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_1ad6e577b2279fc5ff4a4a3fd1d5623f6edc4a50.png" alt="\begin{prooftree}
+\AXM{\neg A}
+\AXM{}
+\UIM{H : A}
+\BIM{\bot}
+\RLM{H}
+\UIM{A \to B}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+In Lean:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-3' mode="ace/mode/lean" readonly="true">variables A B : Prop
+premise HnA : ¬ A
+
+example : A → B :=
+assume HA : A, 
+  show B, from false.elim (HnA HA)
+</juicy-ace-editor><div id='lean-full-code-3' style='display:none'>variables A B : Prop
+premise HnA : ¬ A
+
+example : A → B :=
+assume HA : A, 
+  show B, from false.elim (HnA HA)
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-3').text());">Try it yourself &raquo;</button></div>
+</div>
+
+<p>
+Finally, if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is true and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> is false, we can prove <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_891e7fb974662e3c291c4975bbbc2d9833ef9d22.png" alt="$\neg (A
+\to B)$" />:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_9c40b59ca120f2114774c2121be97e925bb68957.png" alt="\begin{prooftree}
+\AXM{\neg B}
+\AXM{}
+\UIM{H : A \to B}
+\AXM{A}
+\BIM{B}
+\BIM{\bot}
+\RLM{H}
+\UIM{\neg (A \to B)}
+\end{prooftree}
+" /></p>
+</div>
+<p>
+Once again, in Lean:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-4' mode="ace/mode/lean" readonly="true">variables A B : Prop
+premise HA : A
+premise HnB : ¬B
+
+example : ¬ (A → B) :=
+assume H : A → B,
+have HB : B, from H HA,
+show false, from HnB HB
+</juicy-ace-editor><div id='lean-full-code-4' style='display:none'>variables A B : Prop
+premise HA : A
+premise HnB : ¬B
+
+example : ¬ (A → B) :=
+assume H : A → B,
+have HB : B, from H HA,
+show false, from HnB HB
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-4').text());">Try it yourself &raquo;</button></div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline4" class="outline-3">
+<h3 id="orgheadline4"><span class="section-number-3"> 3.3</span> Finding truth assignments</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Now that we have defined the truth of any formula relative to a truth
+assignment, we can answer our first semantic question: given an
+assignment <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_fed9b4c440a2111c9d9789476a6a073e5c7cbda9.png" alt="$v$" /> of truth values to the propositional variables occuring
+in some formula <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_ba5ddce7b6596b9bd5c8b96e8dacc8a546e0705a.png" alt="$\ph$" />, how do we determine whether or not <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_ba5ddce7b6596b9bd5c8b96e8dacc8a546e0705a.png" alt="$\ph$" /> is
+true?  This amounts to evaluating <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_02d405f896ad5640b8db15332074123a87377a3c.png" alt="$\bar v(\ph)$" />, and the recursive
+definition of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_ba5ddce7b6596b9bd5c8b96e8dacc8a546e0705a.png" alt="$\ph$" /> gives a recipe: we evaluate the expressions
+occurring in <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_ba5ddce7b6596b9bd5c8b96e8dacc8a546e0705a.png" alt="$\ph$" /> from the bottom up, starting with the propositional
+variables, and using the evaluation of an expression's components to
+evaluate the expression itself. For example, suppose our truth
+assignment <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_fed9b4c440a2111c9d9789476a6a073e5c7cbda9.png" alt="$v$" /> makes <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> true and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d5420fe138f4d39b6f52f71250e99e0a36aaaab5.png" alt="$C$" /> false. To evaluate <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f89d6ffeae7770168d529bc58d8da5eca9437c07.png" alt="$(B
+\to C) \vee (A \wedge B)$" /> under <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_fed9b4c440a2111c9d9789476a6a073e5c7cbda9.png" alt="$v$" />, note that the expression <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_421ce85ec207aeea52f730b1dc2c597dd862ecc4.png" alt="$B \to
+C$" /> comes out false and the expression <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_ed581df02323b4acaa207b8455be2bc949b9f31b.png" alt="$A \wedge B$" /> comes out
+true. Since a disjunction "false or true" is true, the entire formula
+is true.
+</p>
+
+<p>
+We can also go in the other direction: given a formula, we can attempt
+to find a truth assignment that will make it true (or false). In fact,
+we can use Lean to evaluate formulas for us. In the example that
+follows, you can assign any set of values to the proposition symbols
+<code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, and <code>E</code>. When you run Lean on this input, the
+output of the <code>eval</code> statement is the value of the expression.
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-5' mode="ace/mode/lean" readonly="true">-- Define your truth assignment here, by changing the true/false values as you wish.
+definition A : Prop := true
+definition B : Prop := false
+definition C : Prop := true
+definition D : Prop := true
+definition E : Prop := false
+
+-- Ignore this line.
+attribute A B C D E [reducible] 
+
+eval is_true ((A ∧ B) ∨ C)
+eval is_true (A → D)
+eval is_true (C → (D ∨ ¬E))
+eval is_true (¬(A ∧ B ∧ C ∧ D))
+</juicy-ace-editor><div id='lean-full-code-5' style='display:none'>-- Define your truth assignment here, by changing the true/false values as you wish.
+definition A : Prop := true
+definition B : Prop := false
+definition C : Prop := true
+definition D : Prop := true
+definition E : Prop := false
+
+-- Ignore this line.
+attribute A B C D E [reducible] 
+
+eval is_true ((A ∧ B) ∨ C)
+eval is_true (A → D)
+eval is_true (C → (D ∨ ¬E))
+eval is_true (¬(A ∧ B ∧ C ∧ D))
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-5').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+Try varying the truth assignments, to see what happens. You can add
+your own formulas to the end of the input, and evaluate them as
+well. Try to find truth assignments that make each of the formulas
+tested above evaluate to true. For an extra challenge, try finding a single
+truth assignment that makes them all true at the same time.
+</p>
+</div>
+
+<div id="outline-container-orgheadline3" class="outline-4">
+<h4 id="orgheadline3"><span class="section-number-4"> 3.3.1</span> Truth tables</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<p>
+The second and third semantic questions we asked are a little trickier
+than the first.  Instead of considering one particular truth
+assignment, they ask us to quantify over <i>all</i> possible truth
+assignments.
+</p>
+
+<p>
+Of course, the number of possible truth assignments depends on the
+number of propositional letters we're considering. Since each letter
+has two possible values, <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_6456f2649ddade5686905f71bd3d22a9376cf8af.png" alt="$n$" /> letters will produce <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_f64975aafd2eb2895967fca9465706e32ccdeeb9.png" alt="$2^n$" /> possible truth
+assignments. This number grows very quickly, so we'll mostly look at
+smaller formulas here.
+</p>
+
+<p>
+We'll use something called a <i>truth table</i> to figure out when, if
+ever, a formula is true.  On the left hand side of the truth table,
+we'll put all of the possible truth assignments for the present
+propositional letters. On the right hand side, we'll put the truth
+value of the entire formula under the corresponding assignment.
+</p>
+
+<p>
+To begin with, truth tables can be used to concisely summarize the
+semantics of our logical connectives:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_b92855ef07a019d2dd2f9cc39a141a08cb3b5d19.png" alt="\begin{center}
+\begin{tabular} {|c|c||c|}
+\hline
+$A$      &amp;amp; $B$      &amp;amp; $A \wedge B$ \\ \hline
+$\true$  &amp;amp; $\true$  &amp;amp; $\true$      \\ \hline
+$\true$  &amp;amp; $\false$ &amp;amp; $\false$     \\ \hline
+$\false$ &amp;amp; $\true$  &amp;amp; $\false$     \\ \hline
+$\false$ &amp;amp; $\false$ &amp;amp; $\false$     \\ \hline
+\end{tabular}
+\quad
+\begin{tabular} {|c|c||c|}
+\hline
+$A$      &amp;amp; $B$      &amp;amp; $A \vee B$ \\ \hline
+$\true$  &amp;amp; $\true$  &amp;amp; $\true$      \\ \hline
+$\true$  &amp;amp; $\false$ &amp;amp; $\true$      \\ \hline
+$\false$ &amp;amp; $\true$  &amp;amp; $\true$      \\ \hline
+$\false$ &amp;amp; $\false$ &amp;amp; $\false$     \\ \hline
+\end{tabular}
+\quad
+\begin{tabular} {|c|c||c|}
+\hline
+$A$      &amp;amp; $B$      &amp;amp; $A \to B$ \\ \hline
+$\true$  &amp;amp; $\true$  &amp;amp; $\true$      \\ \hline
+$\true$  &amp;amp; $\false$ &amp;amp; $\false$     \\ \hline
+$\false$ &amp;amp; $\true$  &amp;amp; $\true$      \\ \hline
+$\false$ &amp;amp; $\false$ &amp;amp; $\true$      \\ \hline
+\end{tabular}
+\end{center}
+" /></p>
+</div>
+<p>
+We will leave it to you to write the tabel for <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_c9fc0b9f87a04276e5274737b465662205a69233.png" alt="$\neg A$" />, as an easy
+exercise.
+</p>
+
+<p>
+For compound formulas, the style is much the same. Sometimes it can be
+helpful to include intermediate columns with the truth values of
+subformulas:
+</p>
+
+<div class="figure">
+<p><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_466f16d0623d2f95df2905261a7e168a98a60931.png" alt="\begin{center}
+ \begin{tabular} {|c|c|c||c|c||c|}
+\hline 
+$A$      &amp;amp; $B$      &amp;amp; $C$      &amp;amp; $A \to B$ &amp;amp; $B \to C$ &amp;amp; $(A \to B) \vee (B \to C)$ \\ \hline
+$\true$  &amp;amp; $\true$  &amp;amp; $\true$  &amp;amp; $\true$   &amp;amp; $\true$   &amp;amp; $\true$   \\ \hline
+$\true$  &amp;amp; $\true$  &amp;amp; $\false$ &amp;amp; $\true$   &amp;amp; $\false$  &amp;amp; $\true$   \\ \hline
+$\true$  &amp;amp; $\false$ &amp;amp; $\true$  &amp;amp; $\false$  &amp;amp; $\true$   &amp;amp; $\true$   \\ \hline
+$\true$  &amp;amp; $\false$ &amp;amp; $\false$ &amp;amp; $\false$  &amp;amp; $\true$   &amp;amp; $\true$   \\ \hline
+$\false$ &amp;amp; $\true$  &amp;amp; $\true$  &amp;amp; $\true$   &amp;amp; $\true$   &amp;amp; $\true$   \\ \hline
+$\false$ &amp;amp; $\true$  &amp;amp; $\false$ &amp;amp; $\true$   &amp;amp; $\false$  &amp;amp; $\true$   \\ \hline
+$\false$ &amp;amp; $\false$ &amp;amp; $\true$  &amp;amp; $\true$   &amp;amp; $\true$   &amp;amp; $\true$   \\ \hline
+$\false$ &amp;amp; $\false$ &amp;amp; $\false$ &amp;amp; $\true$   &amp;amp; $\true$   &amp;amp; $\true$   \\ \hline
+\end{tabular}
+\end{center}
+" /></p>
+</div>
+<p>
+By writing out the truth table for a formula, we can glance at the
+rows and see which truth assignments make the formula true. If all the
+entries in the final column are <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_266c51115bfefbe09260fddc1ba02f1c9200a49a.png" alt="$\true$" />, as in the above example, the
+formula is said to be <i>valid</i>.
+</p>
+
+<p>
+We can use Lean to check if whether we have evaluated a formula
+correctly:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-6' mode="ace/mode/lean" readonly="true">/-                   Put your formula here  -/
+/-                   \/                     -/
+eval let e :=
+  λ A      B,        A ∧ (B → A)   in is_true (
+( e true   true   ↔  true          ) ∧
+( e true   false  ↔  true          ) ∧
+( e false  true   ↔  false         ) ∧
+( e false  false  ↔  false         ) )
+</juicy-ace-editor><div id='lean-full-code-6' style='display:none'>/-                   Put your formula here  -/
+/-                   \/                     -/
+eval let e :=
+  λ A      B,        A ∧ (B → A)   in is_true (
+( e true   true   ↔  true          ) ∧
+( e true   false  ↔  true          ) ∧
+( e false  true   ↔  false         ) ∧
+( e false  false  ↔  false         ) )
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-6').text());">Try it yourself &raquo;</button></div>
+</div>
+<p>
+You can replace the formula <code>A ∧ (B → A)</code> with any other formula
+involving the variables <code>A</code> and <code>B</code>. Then, leaving the first two
+columns alone, modify the third column by entering the value <code>true</code> or
+<code>false</code> corresponding to the assignment in the first two columns. The
+resulting expression will evaluate to true if and only if you have
+entered the correct truth values.
+</p>
+
+<p>
+(The precise mechanism by which this works is not important right now,
+but in case you are curious, the idea is as follows. In the
+expression, the <code>e</code> is "locally" defined to be the function which
+takes two truth values <code>A</code> and <code>B</code> as input, and evaluates <code>A ∧ (B →
+A)</code> relative to these inputs. For each line in the truth table, the
+expression checks whether the formula evaluates to the value you
+entered, and takes the conjunction of the results.)
+</p>
+
+<p>
+Here is the analogous setup for three variables:
+</p>
+<div class="org-src-container">
+<juicy-ace-editor id='lean-juicy-ace-editor-7' mode="ace/mode/lean" readonly="true">eval let e :=
+  λ A      B      C,        A ∧ (B → C)   in is_true (
+( e true   true   true   ↔  true          ) ∧ 
+( e true   true   false  ↔  false         ) ∧
+( e true   false  true   ↔  true          ) ∧
+( e true   false  false  ↔  true          ) ∧
+( e false  true   true   ↔  false         ) ∧
+( e false  true   false  ↔  false         ) ∧
+( e false  false  true   ↔  false         ) ∧
+( e false  false  false  ↔  false         ) )
+</juicy-ace-editor><div id='lean-full-code-7' style='display:none'>eval let e :=
+  λ A      B      C,        A ∧ (B → C)   in is_true (
+( e true   true   true   ↔  true          ) ∧ 
+( e true   true   false  ↔  false         ) ∧
+( e true   false  true   ↔  true          ) ∧
+( e true   false  false  ↔  true          ) ∧
+( e false  true   true   ↔  false         ) ∧
+( e false  true   false  ↔  false         ) ∧
+( e false  false  true   ↔  false         ) ∧
+( e false  false  false  ↔  false         ) )
+</div><div class='no-print' align="left"><button type="button" onclick="invoke_leanjs($('#lean-full-code-7').text());">Try it yourself &raquo;</button></div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5"><span class="section-number-3"> 3.4</span> Soundness and Completeness</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+Fix a deductive system, such as natural deduction. A
+propositional formula is said to be <i>provable</i> if there is a formal
+proof of it in the system. A propositional formula is said to be a
+<i>tautology</i>, or <i>valid</i>, if it is true under any truth
+assignment. Provability is a syntactic notion, insofar as it asserts
+the existence of a syntactic object, namely, a proof. Validity is a
+semantic notion, insofar as it has to do with truth assignments and
+valuations. But, intuitively, these notions should coincide: both
+express the idea that a formula <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> <i>has</i> to be true, or is
+<i>necessarily</i> true, and one would expect a good proof system to enable
+us to derive the valid formulas.
+</p>
+
+<p>
+Because of the way we have chosen our inference rules and defined the
+notion of a valuation, this intuition holds true. The statement that
+every provable formula is valid is known as <i>soundness</i>, and the
+statement that we can prove every valid formula is known as
+<i>completeness</i>.
+</p>
+
+<p>
+These notions extend to provability from hypotheses. If <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" /> is a
+set of propositional formulas and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is a propositional formula, then
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is said to be a <i>logical consequence</i> of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" /> if, given any
+truth assignment that makes every formula in <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" /> true, <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is
+true as well. In this extended setting, soundness says that if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is
+provable from <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />, then <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is a logical consequence of
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />. Completeness runs the other way: if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is a logical
+consequence of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />, it is provable.
+</p>
+
+<p>
+Notice that with the rules of natural deduction, a formula <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is
+provable from a set of hypotheses <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d7303e1591d90de1e05f0e9d5cc76fc793bf60bd.png" alt="$\{ B_1, B_2, \ldots, B_n \}$" /> if and only
+if the formula <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d34115aacf9d68198315fe70514edb07bb200e60.png" alt="$B_1 \wedge B_2 \wedge \cdots \wedge B_n \to A$" /> is
+provable outright, that is, from no hypotheses. So, at least for
+finite sets of formulas <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />, the two statements of soundness and
+completeness are equivalent.
+</p>
+
+<p>
+Proving soundness and completeness belongs to the realm of
+<i>metatheory</i>, since it requires us to reason about our methods of
+reasoning. This is not a central focus of this course: we are more
+concerned with <i>using</i> logic and the notion of truth than with
+establishing their properties. But the notions of soundness and
+completeness play an important role in helping us understand the
+nature of the logical notions, and so we will try to provide some
+hints here as to why these properties hold for propositional logic.
+</p>
+
+<p>
+Proving soundness is easier. We wish to show that whenever <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is
+provable from a set of hypotheses, <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />, then <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is a logical
+consequence of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />. In a later chapter, we will consider proofs
+by induction, which allows us to establish a property holds of a
+general collection of objects by showing that it holds of some
+"simple" ones and is preserved under the passage to objects that are
+more complex. In the case of natural deduction, it is enough to show
+that soundness holds of the most basic proofs &#x2014; using the assumption
+rule &#x2014; and that it is preserved under each rule of inference. The
+base case is easy: the assumption rule says that <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is provable from
+hypothesis <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />, and clearly every truth assignment that makes <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> true
+makes <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> true. The inductive steps are not much harder; it involves
+checking that the rules we have chosen mesh with the semantic
+notions. For example, suppose the last rule is the and introduction
+rule. In that case, we have a proof of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> from some hypotheses
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" />, and a proof of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> from some hypotheses <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_5fee40130f8d4b40702593fcd7cb7698e18376a6.png" alt="$\Delta$" />, and we
+combine these to form a proof of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_ed581df02323b4acaa207b8455be2bc949b9f31b.png" alt="$A \wedge B$" /> from the hypotheses in
+<img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_b0dd1ac9d2f64c5502628f2baf74b541de8b82f4.png" alt="$\Gamma \cup \Delta$" />, that is, the hypotheses in both. Inductively, we
+can assume that <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is a logical consequence of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_58d6fdeb6cee3969df547edb4609d78c9fc1c44c.png" alt="$\Gamma$" /> and that <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" />
+is a logical consequence of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_5fee40130f8d4b40702593fcd7cb7698e18376a6.png" alt="$\Delta$" />. Let <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_fed9b4c440a2111c9d9789476a6a073e5c7cbda9.png" alt="$v$" /> be any truth assignment
+that makes every formula in <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_b0dd1ac9d2f64c5502628f2baf74b541de8b82f4.png" alt="$\Gamma \cup \Delta$" /> true. Then by the
+inductive hypothesis, we have that it makes <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> true, and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> true as
+well. By the definition of the valuation function, <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_0d8931103fae4b7c06306484ef9de332881cb51a.png" alt="$\bar v (A \wedge
+B) = \true$" />, as required.
+</p>
+
+<p>
+Proving completeness is harder. It suffices to show that if <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is any
+tautology, then <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is provable. One strategy is to show that natural
+deduction can simulate the method of truth tables. For example,
+suppose <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> is build up from propositional variables <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d97dc406cb5606cb9d7e849c11adc553d50b79a6.png" alt="$B$" /> and <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_d5420fe138f4d39b6f52f71250e99e0a36aaaab5.png" alt="$C$" />. Then
+in natural deduction, we should be able to prove 
+</p>
+
+
+<div class="figure">
+<p><img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_16aa59c6575b27795e5b6f45c4a88fac9f4293c7.png" alt="\begin{equation*}
+(B \wedge C) \vee (B \wedge \neg C) \vee (\neg B \wedge C) \vee
+(\neg B \wedge \neg C),
+\end{equation*}
+" /></p>
+</div>
+
+<p>
+with one disjunct for each line of the truth table. Then, we should
+be able to use each disjunct to "evaluate" each expression occurring
+in <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />, proving it true or false in accordance with its valuation,
+until we have a proof of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> itself.
+</p>
+
+<p>
+A nicer way to proceed is to express the rules of natural deduction
+in a way that allows us to work backwards from <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> in search of a
+proof. In other words, first, we give a procedure for constructing a
+derivation of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> by working backwards from <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />. Then we argue that if
+the procedure fails, then, at the point where it fails, we can find a
+truth assignment that makes <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> false. As a result, if every truth
+assignment makes <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" /> true, the procedure returns a proof of <img src="ltxpng/03_Truth_Tables_and_Semantics.org.temp_cfd84d0cf5b16a0279ed47d0d5204f0d029e1098.png" alt="$A$" />.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
